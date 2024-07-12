@@ -18,10 +18,10 @@ import {
 } from "@/utils/wallet/index";
 import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
-import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
+import { PaginatedDelegations, getDelegations } from "./api/getDelegations";
 import {
-  getFinalityProviders,
   PaginatedFinalityProviders,
+  getFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { signPsbtTransaction } from "./common/utils/psbt";
@@ -32,10 +32,9 @@ import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { TermsModal } from "./components/Modals/Terms/TermsModal";
-import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
-import { Staking } from "./components/Staking/Staking";
+import { StakingModal } from "./components/Staking/StakingModal";
+import { provider } from "./components/Staking/provider.data.js";
 import { Stats } from "./components/Stats/Stats";
-import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
@@ -222,6 +221,12 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
+  const [stakingModalOpen, setStakingModalOpen] = useState(false);
+
+  const handleStakingModal = () => {
+    setStakingModalOpen(true);
+  };
+
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
     setBTCWalletBalanceSat(0);
@@ -329,11 +334,22 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  let totalPendingSat = 0;
+
+  if (delegationsLocalStorage) {
+    totalPendingSat = delegationsLocalStorage
+      // using only pending delegations
+      .filter((delegation) => delegation?.state === DelegationState.PENDING)
+      .reduce(
+        (accumulator: number, item) => accumulator + item?.stakingValueSat,
+        0,
+      );
+  }
+
   return (
     <main
-      className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
+      className={`relative h-full min-h-svh w-full pt-20 bg-es-bg ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
     >
-      <NetworkBadge />
       <Header
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
@@ -342,15 +358,21 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          <Stats />
-          {address && (
+          <Stats
+            onConnect={handleConnectModal}
+            onStaking={handleStakingModal}
+            address={address}
+            totalStakedSat={totalStakedSat}
+            totalPendingSat={totalPendingSat}
+          />
+          {/* {address && (
             <Summary
               address={address}
               totalStakedSat={totalStakedSat}
               balanceSat={btcWalletBalanceSat}
             />
-          )}
-          <Staking
+          )} */}
+          {/* <Staking
             btcHeight={paramWithContext?.currentHeight}
             finalityProviders={finalityProviders?.finalityProviders}
             isWalletConnected={!!btcWallet}
@@ -367,7 +389,7 @@ const Home: React.FC<HomeProps> = () => {
             address={address}
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
-          />
+          /> */}
           {btcWallet &&
             delegations &&
             paramWithContext?.nextBlockParams.currentVersion &&
@@ -408,6 +430,21 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <StakingModal
+        open={stakingModalOpen}
+        onClose={setStakingModalOpen}
+        btcHeight={paramWithContext?.currentHeight}
+        finalityProvider={provider}
+        isWalletConnected={!!btcWallet}
+        onConnect={handleConnectModal}
+        isLoading={isLoadingCurrentParams}
+        btcWallet={btcWallet}
+        btcWalletBalanceSat={btcWalletBalanceSat}
+        btcWalletNetwork={btcWalletNetwork}
+        address={address}
+        publicKeyNoCoord={publicKeyNoCoord}
+        setDelegationsLocalStorage={setDelegationsLocalStorage}
       />
       <ErrorModal
         open={isErrorOpen}
