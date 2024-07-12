@@ -30,7 +30,6 @@ import { FeedbackModal } from "../Modals/FeedbackModal";
 import { PreviewModal } from "../Modals/PreviewModal";
 
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
-import { StakingAmount } from "./Form/StakingAmount";
 import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
@@ -584,13 +583,13 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
                 reset={resetFormInputs}
               />
-              <StakingAmount
+              {/* <StakingAmount
                 minStakingAmountSat={minStakingAmountSat}
                 maxStakingAmountSat={maxStakingAmountSat}
                 btcWalletBalanceSat={btcWalletBalanceSat}
                 onStakingAmountSatChange={handleStakingAmountSatChange}
                 reset={resetFormInputs}
-              />
+              /> */}
               {signReady && (
                 <StakingFee
                   mempoolFeeRates={mempoolFeeRates}
