@@ -6,7 +6,7 @@ import "react-tooltip/dist/react-tooltip.css";
 import "./globals.css";
 import Providers from "./providers";
 
-const inter = Space_Grotesk({
+const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
 });
@@ -44,7 +44,7 @@ export default function RootLayout({
       <meta name="twitter:image:type" content="image/png" />
       <meta name="twitter:image:width" content="2048" />
       <meta name="twitter:image:height" content="1170" />
-      <body className={inter.className}>
+      <body className={spaceGrotesk.className}>
         <Providers>{children}</Providers>
       </body>
     </html>
