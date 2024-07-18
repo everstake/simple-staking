@@ -28,8 +28,13 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   stakingFeeSat,
 }) => {
   const initialStakingValue = () => {
-    onStakingAmountSatChange(minStakingAmountSat);
-    return maxDecimals(satoshiToBtc(minStakingAmountSat), 8).toString();
+    const walletBalanceAfterFeeSat = btcWalletBalanceSat - stakingFeeSat;
+    const maxValueAfterFee =
+      walletBalanceAfterFeeSat > maxStakingAmountSat
+        ? maxStakingAmountSat
+        : walletBalanceAfterFeeSat;
+    onStakingAmountSatChange(maxValueAfterFee);
+    return maxDecimals(satoshiToBtc(maxValueAfterFee), 8).toString();
   };
   const [value, setValue] = useState(initialStakingValue);
   const [error, setError] = useState("");
