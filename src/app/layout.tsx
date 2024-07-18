@@ -1,12 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
 import "react-responsive-modal/styles.css";
 import "react-tooltip/dist/react-tooltip.css";
 
 import "./globals.css";
 import Providers from "./providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const inter = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
 
 export const metadata: Metadata = {
   title: "Babylon - Staking Dashboard",
