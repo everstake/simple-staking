@@ -5,7 +5,6 @@ import { useOnClickOutside } from "usehooks-ts";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { trim } from "@/utils/trim";
-
 interface ConnectSmallProps {
   onConnect: () => void;
   address: string;
@@ -33,11 +32,11 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
     <div className="relative mr-[-10px] flex text-sm">
       <button className="flex cursor-pointer outline-none">
         <div className="relative right-[10px] border uppercase text-es-text-secondary border-[#5b5b5b] bg-transparent text-sm md:text-base p-2 flex items-center justify-between min-w-[120px] md:min-w-[180px]">
-          <span onClick={onConnect} className="hover:text-es-accent">
+          <span onClick={onConnect} className="md:hover:text-es-accent">
             {trim(address)}
           </span>
           <FaArrowCircleRight
-            fill="#b2b2b2"
+            className="fill-es-text-secondary md:hover:fill-es-accent"
             onClick={() => {
               onDisconnect();
             }}
@@ -46,7 +45,11 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       </button>
     </div>
   ) : (
-    <button className="primary-button" onClick={onConnect} disabled={!!address}>
+    <button
+      className="primary-button button-arrow"
+      onClick={onConnect}
+      disabled={!!address}
+    >
       <PiWalletBold size={20} className="flex md:hidden" />
       <span className="hidden md:flex uppercase text-black font-medium text-lg">
         Stake now

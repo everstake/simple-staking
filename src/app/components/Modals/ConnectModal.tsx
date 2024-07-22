@@ -5,7 +5,7 @@ import { FaWallet } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
-import ArrowRight from "@/app/components/Icons/ArrowRight";
+import { ArrowRight } from "@/app/components/Icons/ArrowRight";
 import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
