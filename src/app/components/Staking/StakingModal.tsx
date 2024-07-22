@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
-import { useLocalStorage } from "usehooks-ts";
 
 import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
@@ -27,7 +26,6 @@ import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
-import { FeedbackModal } from "../Modals/FeedbackModal";
 import { GeneralModal } from "../Modals/GeneralModal";
 import { PreviewModal } from "../Modals/PreviewModal";
 
@@ -59,6 +57,7 @@ interface StakingModalProps {
   address: string | undefined;
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
+  onStakeSuccess: (value: string) => void;
 }
 
 export const StakingModal: React.FC<StakingModalProps> = ({
@@ -75,6 +74,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
   btcWalletBalanceSat,
   open,
   onClose,
+  onStakeSuccess,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -85,14 +85,6 @@ export const StakingModal: React.FC<StakingModalProps> = ({
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [termsChecked, setTermsChecked] = useState(false);
   const [error, setError] = useState("");
-  const [feedbackModal, setFeedbackModal] = useState<{
-    type: "success" | "cancel" | null;
-    isOpen: boolean;
-  }>({ type: null, isOpen: false });
-  const [successFeedbackModalOpened, setSuccessFeedbackModalOpened] =
-    useLocalStorage<boolean>("bbn-staking-successFeedbackModalOpened", false);
-  const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
-    useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
   const [paramWithCtx, setParamWithCtx] = useState<
     ParamsWithContext | undefined
   >();
@@ -297,7 +289,10 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         availableUTXOs,
       );
       // UI
-      handleFeedbackModal("success");
+      const stakingTxHash = Transaction.fromHex(stakingTxHex).getId();
+      const { mempoolApiUrl } = getNetworkConfig();
+      onStakeSuccess(`${mempoolApiUrl}/tx/${stakingTxHash}`);
+      onClose(false);
       handleLocalStorageDelegations(stakingTxHex, stakingTerm);
       handleResetState();
     } catch (error: Error | any) {
@@ -401,24 +396,6 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     setStakingTimeBlocks(inputTimeBlocks);
   };
 
-  // Show feedback modal only once for each type
-  const handleFeedbackModal = (type: "success" | "cancel") => {
-    if (!feedbackModal.isOpen && feedbackModal.type !== type) {
-      const isFeedbackModalOpened =
-        type === "success"
-          ? successFeedbackModalOpened
-          : cancelFeedbackModalOpened;
-      if (!isFeedbackModalOpened) {
-        setFeedbackModal({ type, isOpen: true });
-      }
-    }
-  };
-
-  const handlePreviewModalClose = (isOpen: boolean) => {
-    setPreviewModalOpen(isOpen);
-    handleFeedbackModal("cancel");
-  };
-
   const showOverflowWarning = (overflow: OverflowProperties) => {
     if (overflow.isHeightCap) {
       return (
@@ -445,15 +422,6 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         />
       );
     }
-  };
-
-  const handleCloseFeedbackModal = () => {
-    if (feedbackModal.type === "success") {
-      setSuccessFeedbackModalOpened(true);
-    } else if (feedbackModal.type === "cancel") {
-      setCancelFeedbackModalOpened(true);
-    }
-    setFeedbackModal({ type: null, isOpen: false });
   };
 
   const showApproachingCapWarning = () => {
@@ -639,7 +607,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
             </button>
             <PreviewModal
               open={previewModalOpen}
-              onClose={handlePreviewModalClose}
+              onClose={setPreviewModalOpen}
               onSign={handleSign}
               finalityProvider={finalityProvider?.description.moniker}
               stakingAmountSat={stakingAmountSat}
@@ -665,11 +633,6 @@ export const StakingModal: React.FC<StakingModalProps> = ({
       <div className="flex flex-col flex-grow mt-8 md:max-w-[480px] ">
         {renderStakingForm()}
       </div>
-      <FeedbackModal
-        open={feedbackModal.isOpen}
-        onClose={onClose}
-        type={feedbackModal.type}
-      />
     </GeneralModal>
   );
 };

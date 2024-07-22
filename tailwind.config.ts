@@ -29,6 +29,8 @@ const config: Config = {
         "es-border": "#5B5B5B",
         "es-text-hint": "#828282",
         "es-error": "#FF5353",
+        "es-success-light": "rgba(187, 255, 155, 0.6)",
+        "es-success": "#BBFF9B",
       },
       gridTemplateColumns: {
         stakingFinalityProvidersMobile: "2fr 1fr",

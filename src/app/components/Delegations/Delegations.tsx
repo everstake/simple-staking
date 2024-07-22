@@ -13,6 +13,7 @@ import {
 } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { getNetworkConfig } from "@/config/network.config";
 import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
@@ -40,6 +41,8 @@ interface DelegationsProps {
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
   getNetworkFees: WalletProvider["getNetworkFees"];
+  onSuccessWithdraw: (txHex: string) => void;
+  onSuccessUnbond: (txHex: string) => void;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -54,12 +57,15 @@ export const Delegations: React.FC<DelegationsProps> = ({
   pushTx,
   queryMeta,
   getNetworkFees,
+  onSuccessWithdraw,
+  onSuccessUnbond,
 }) => {
   const [stakingFeeRate, setStakingFeeRate] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
+  const { mempoolApiUrl } = getNetworkConfig();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -106,6 +112,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       );
       // Update the local state with the new intermediate delegation
       updateLocalStorage(delegation, DelegationState.INTERMEDIATE_UNBONDING);
+      onSuccessUnbond(`${mempoolApiUrl}/tx/${txID}`);
     } catch (error: Error | any) {
       showError({
         error: {
@@ -139,6 +146,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       );
       // Update the local state with the new intermediate delegation
       updateLocalStorage(delegation, DelegationState.INTERMEDIATE_WITHDRAWAL);
+      onSuccessWithdraw(`${mempoolApiUrl}/tx/${txID}`);
     } catch (error: Error | any) {
       showError({
         error: {
