@@ -104,7 +104,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             min={minFeeRate}
             max={maxFeeRate}
             value={selectedFeeRate || defaultFeeRate}
-            className={`range range-xs my-2 opacity-60 ${showLowFeesWarning ? "range-error" : "range-primary"}`}
+            className={`range range-xs my-2 ${showLowFeesWarning ? "range-error" : "range-primary"}`}
             onChange={handleSliderChange}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
