@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { FaArrowCircleRight } from "react-icons/fa";
+import { IoMdExit } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { useOnClickOutside } from "usehooks-ts";
 
@@ -35,8 +35,8 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           <span onClick={onConnect} className="md:hover:text-es-accent">
             {trim(address)}
           </span>
-          <FaArrowCircleRight
-            className="fill-es-text-secondary md:hover:fill-es-accent"
+          <IoMdExit
+            className="fill-es-text-secondary md:hover:fill-es-accent size-6"
             onClick={() => {
               onDisconnect();
             }}
