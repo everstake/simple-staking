@@ -11,6 +11,8 @@
   --es-text-secondary: "#b2b2b2";
   --es-secondary-2: "#212121";
   --es-border: "#5B5B5B";
+  --es-success-light: #bbff9b99;
+  --es-success: #bbff9b;
   --es-form-bg: linear-gradient(
     186.33deg,
     rgba(64, 64, 64, 0.4) 4.99%,

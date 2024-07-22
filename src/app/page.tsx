@@ -35,6 +35,7 @@ import { TermsModal } from "./components/Modals/Terms/TermsModal";
 import { StakingModal } from "./components/Staking/StakingModal";
 import { provider } from "./components/Staking/provider.data.js";
 import { Stats } from "./components/Stats/Stats";
+import { Toast } from "./components/Toast/Toast";
 import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
@@ -227,6 +228,51 @@ const Home: React.FC<HomeProps> = () => {
     setStakingModalOpen(true);
   };
 
+  const handleUnbondSuccessTx = (tx: string) => {
+    handleSuccessfulMessage(
+      true,
+      "You successfully unbond your BTC",
+      "It could take up to 2 hours your stake to become active",
+      tx,
+    );
+  };
+
+  const handleWithdrawSuccessTx = (tx: string) => {
+    handleSuccessfulMessage(
+      true,
+      "You successfully withdraw your BTC",
+      "It could take up to 2 hours your stake to become active",
+      tx,
+    );
+  };
+
+  const handleStakeSuccessTx = (tx: string) => {
+    handleSuccessfulMessage(
+      true,
+      "You successfully staked your BTC",
+      "It could take up to 2 hours your stake to become active",
+      tx,
+    );
+  };
+
+  const [successfulMessageVisible, setSuccessfulMessageVisible] =
+    useState(false);
+  const [successfulMessageTitle, setSuccessfulMessageTitle] = useState("");
+  const [successfulMessageDesc, setSuccessfulMessageDesc] = useState("");
+  const [successfulMessageLink, setSuccessfulMessageLink] = useState("");
+
+  const handleSuccessfulMessage = (
+    visible: boolean,
+    title?: string,
+    desc?: string,
+    link?: string,
+  ) => {
+    setSuccessfulMessageVisible(visible);
+    setSuccessfulMessageTitle(title ?? "");
+    setSuccessfulMessageDesc(desc ?? "");
+    setSuccessfulMessageLink(link ?? "");
+  };
+
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
     setBTCWalletBalanceSat(0);
@@ -413,6 +459,8 @@ const Home: React.FC<HomeProps> = () => {
                   isFetchingMore: isFetchingNextDelegationsPage,
                 }}
                 getNetworkFees={btcWallet.getNetworkFees}
+                onSuccessWithdraw={handleWithdrawSuccessTx}
+                onSuccessUnbond={handleUnbondSuccessTx}
               />
             )}
           {/* At this point of time is not used */}
@@ -445,6 +493,14 @@ const Home: React.FC<HomeProps> = () => {
         address={address}
         publicKeyNoCoord={publicKeyNoCoord}
         setDelegationsLocalStorage={setDelegationsLocalStorage}
+        onStakeSuccess={handleStakeSuccessTx}
+      />
+      <Toast
+        open={successfulMessageVisible}
+        title={successfulMessageTitle}
+        desc={successfulMessageDesc}
+        link={successfulMessageLink}
+        onClose={handleSuccessfulMessage}
       />
       <ErrorModal
         open={isErrorOpen}
