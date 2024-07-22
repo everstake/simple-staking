@@ -1,9 +1,8 @@
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-import arrowRight from "@/app/assets/arrow-right.svg";
+import { ArrowRight } from "@/app/components/Icons/ArrowRight";
 import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
@@ -60,19 +59,14 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="uppercase text-base inline-flex items-center gap-2 md:hover:opacity-70 md:transition-opacity"
+            className="uppercase text-base inline-flex items-center gap-2 button-with-icon md:hover:text-es-accent"
             onClick={() => onUnbond(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_UNBONDING
             }
           >
             Unbond
-            <Image
-              src={arrowRight}
-              className=""
-              style={{ width: "16px" }}
-              alt="arrow-right"
-            />
+            <ArrowRight width={17} />
           </button>
         </div>
       );
@@ -80,19 +74,14 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="uppercase text-base inline-flex items-center gap-2 md:hover:opacity-70 md:transition-opacity"
+            className="uppercase text-base inline-flex items-center gap-2 button-with-icon md:hover:text-es-accent"
             onClick={() => onWithdraw(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
             }
           >
             Withdraw
-            <Image
-              src={arrowRight}
-              className=""
-              style={{ width: "16px" }}
-              alt="arrow-right"
-            />
+            <ArrowRight width={17} />
           </button>
         </div>
       );
