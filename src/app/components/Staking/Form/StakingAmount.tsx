@@ -36,20 +36,33 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     onStakingAmountSatChange(maxValueAfterFee);
     return maxDecimals(satoshiToBtc(maxValueAfterFee), 8).toString();
   };
+
   const [value, setValue] = useState(initialStakingValue);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
+  const [isMinActive, setIsMinActive] = useState(false);
+  const [isMaxActive, setIsMaxActive] = useState(true);
 
   const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
   const { coinName } = getNetworkConfig();
 
   useEffect(() => {
-    setValue(initialStakingValue);
+    const initialValue = initialStakingValue();
+    setValue(initialValue);
     setError("");
     setTouched(false);
     onError("");
+    updateButtonStates(initialValue);
   }, [reset, minStakingAmountSat]);
+
+  const updateButtonStates = (newValue: string) => {
+    const numValue = parseFloat(newValue);
+    const satoshis = btcToSatoshi(numValue);
+
+    setIsMinActive(satoshis === minStakingAmountSat);
+    setIsMaxActive(satoshis === maxStakingAmountSat);
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -119,6 +132,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       onStakingAmountSatChange(satoshis);
       setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
+
+    updateButtonStates(value);
   };
 
   const handleMaxClick = () => {
@@ -138,6 +153,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
     setValue(maxValue);
     onStakingAmountSatChange(maxValueAfterFee < 0 ? 0 : maxValueAfterFee);
+    updateButtonStates(maxValue);
   };
 
   const handleMinClick = () => {
@@ -149,6 +165,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     ).toString();
     setValue(minValue);
     onStakingAmountSatChange(minStakingAmountSat);
+    updateButtonStates(minValue);
   };
 
   return (
@@ -175,13 +192,13 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       </label>
       <div className="flex flex-col w-12">
         <button
-          className="bg-none font-medium text-xs uppercase py-1 px-2 border border-es-border border-b-0 text-es-accent md:hover:opacity-70 md:transition-opacity"
+          className={`bg-none font-medium text-xs uppercase py-1 px-2 border border-es-border border-b-0  md:hover:opacity-70 md:transition-opacity ${isMaxActive ? "text-es-accent" : "text-es-text-secondary"}`}
           onClick={handleMaxClick}
         >
           max
         </button>
         <button
-          className="bg-none font-medium text-xs uppercase py-1 px-2 border border-es-border text-es-text-secondary md:hover:opacity-70 md:transition-opacity"
+          className={`bg-none font-medium text-xs uppercase py-1 px-2 border border-es-border  md:hover:opacity-70 md:transition-opacity ${isMinActive ? "text-es-accent" : "text-es-text-secondary"}`}
           onClick={handleMinClick}
         >
           min
