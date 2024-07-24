@@ -479,22 +479,24 @@ const Home: React.FC<HomeProps> = () => {
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
       />
-      <StakingModal
-        open={stakingModalOpen}
-        onClose={setStakingModalOpen}
-        btcHeight={paramWithContext?.currentHeight}
-        finalityProvider={provider}
-        isWalletConnected={!!btcWallet}
-        onConnect={handleConnectModal}
-        isLoading={isLoadingCurrentParams}
-        btcWallet={btcWallet}
-        btcWalletBalanceSat={btcWalletBalanceSat}
-        btcWalletNetwork={btcWalletNetwork}
-        address={address}
-        publicKeyNoCoord={publicKeyNoCoord}
-        setDelegationsLocalStorage={setDelegationsLocalStorage}
-        onStakeSuccess={handleStakeSuccessTx}
-      />
+      {stakingModalOpen && (
+        <StakingModal
+          open={stakingModalOpen}
+          onClose={setStakingModalOpen}
+          btcHeight={paramWithContext?.currentHeight}
+          finalityProvider={provider}
+          isWalletConnected={!!btcWallet}
+          onConnect={handleConnectModal}
+          isLoading={isLoadingCurrentParams}
+          btcWallet={btcWallet}
+          btcWalletBalanceSat={btcWalletBalanceSat}
+          btcWalletNetwork={btcWalletNetwork}
+          address={address}
+          publicKeyNoCoord={publicKeyNoCoord}
+          setDelegationsLocalStorage={setDelegationsLocalStorage}
+          onStakeSuccess={handleStakeSuccessTx}
+        />
+      )}
       <Toast
         open={successfulMessageVisible}
         title={successfulMessageTitle}
