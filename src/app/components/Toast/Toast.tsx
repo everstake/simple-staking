@@ -41,7 +41,7 @@ export const Toast: React.FC<ToastProps> = ({
   if (!open) return null;
 
   return (
-    <div className="max-w-[480px] fixed left-10 right-10 top-28 z-10 bg-es-bg p-5 md:left-auto">
+    <div className="max-w-[480px] fixed left-7 right-7 top-7 z-10 bg-es-bg p-5 md:left-auto">
       <div className="w-full h-1 bg-es-success-light absolute -top-1 left-0 right-0 overflow-hidden">
         <div
           className="h-full w-0 bg-es-success"

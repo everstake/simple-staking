@@ -80,7 +80,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(64000);
   // Selected fee rate, comes from the user input
-  const [selectedFeeRate, setSelectedFeeRate] = useState(0);
+  const [selectedFeeRate, setSelectedFeeRate] = useState(1);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [termsChecked, setTermsChecked] = useState(false);
@@ -241,7 +241,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
   const handleResetState = () => {
     setStakingAmountSat(0);
     setStakingTimeBlocks(64000);
-    setSelectedFeeRate(0);
+    setSelectedFeeRate(defaultFeeRate);
     setPreviewModalOpen(false);
     setResetFormInputs(!resetFormInputs);
     setTermsChecked(false);
