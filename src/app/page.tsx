@@ -231,8 +231,8 @@ const Home: React.FC<HomeProps> = () => {
   const handleUnbondSuccessTx = (tx: string) => {
     handleSuccessfulMessage(
       true,
-      "You successfully unbond your BTC",
-      "It could take up to 2 hours your stake to become active",
+      "The expected unbonding time is about 1 day.",
+      "After unbonded, you will need to withdraw your stake to appear in your wallet.",
       tx,
     );
   };
@@ -241,7 +241,7 @@ const Home: React.FC<HomeProps> = () => {
     handleSuccessfulMessage(
       true,
       "You successfully withdraw your BTC",
-      "It could take up to 2 hours your stake to become active",
+      "Your staked funds will appear in your wallet after transaction is completed",
       tx,
     );
   };

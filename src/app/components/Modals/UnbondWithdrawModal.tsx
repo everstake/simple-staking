@@ -35,16 +35,21 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
 
   const unbondContent = (
     <>
-      You are about to unbond your stake before its expiration. <br />A
-      transaction fee of{" "}
-      <strong>
-        {maxDecimals(satoshiToBtc(unbondingFeeSat), 8) || 0} {coinName}
-      </strong>{" "}
-      will be deduced from your stake by the {networkName} network. <br />
-      The expected unbonding time will be about{" "}
-      <strong>{blocksToDisplayTime(unbondingTimeBlocks)}</strong>. <br />
-      After unbonded, you will need to use this dashboard to withdraw your stake
-      for it to appear in your wallet.
+      <p>You are about to unbond your stake before its expiration.</p> <br />
+      <p>
+        A transaction fee of{" "}
+        <strong>
+          {maxDecimals(satoshiToBtc(unbondingFeeSat), 8) || 0} {coinName}
+        </strong>{" "}
+        will be deduced from your stake by the {networkName} network.
+      </p>
+      <br />
+      <p>
+        The expected unbonding time will be about{" "}
+        <strong>{blocksToDisplayTime(unbondingTimeBlocks)}</strong>. <br />
+        After unbonded, you will need to use this dashboard to withdraw your
+        stake for it to appear in your wallet.
+      </p>
     </>
   );
 
@@ -52,7 +57,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const withdrawContent = (
     <>
       You are about to withdraw your stake. <br />A transaction fee will be
-      deduced from your stake by the {networkName} network
+      deducted from your stake by the {networkName} network
     </>
   );
 
@@ -76,8 +81,8 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
       small
       classNames={{ modal: "stake-modal unbond-modal" }}
     >
-      <div className="md:max-w-[480px]">
-        <div className="flex flex-col flex-grow mt-8 md:max-w-[480px]">
+      <div className="md:max-w-[480px] md:min-h-[430px] flex flex-col justify-start">
+        <div className="flex flex-col mt-8 md:max-w-[480px]">
           <h3 className="text-center font-semibold text-xl uppercase">
             {mode === MODE_UNBOND ? unbondTitle : withdrawTitle}
           </h3>
@@ -90,10 +95,10 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
             </button>
           </div>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 flex-grow">
           <p className="px-9 pt-4 text-es-accent font-medium">{content}</p>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 mt-auto">
             <button
               className="es-button"
               onClick={() => {
