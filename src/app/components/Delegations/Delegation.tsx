@@ -55,6 +55,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     // based on the state of the delegation
     // It also disables the button if the delegation
     // is in an intermediate state (local storage)
+    console.log("generate button", state, stakingTxHash);
     if (state === DelegationState.ACTIVE) {
       return (
         <div className="flex justify-end lg:justify-start">
@@ -74,7 +75,11 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="uppercase text-base inline-flex items-center gap-2 button-with-icon md:hover:text-es-accent"
+            className={`uppercase text-base inline-flex items-center gap-2  ${
+              intermediateState !== DelegationState.INTERMEDIATE_WITHDRAWAL
+                ? "md:hover:text-es-accent button-with-icon"
+                : ""
+            } disabled:opacity-70`}
             onClick={() => onWithdraw(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
