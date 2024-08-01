@@ -44,7 +44,8 @@
     "react-tooltip": "^5.26.4",
     "sharp": "^0.33.4",
     "url-safe-base64": "^1.3.0",
-    "usehooks-ts": "^3.0.2"
+    "usehooks-ts": "^3.0.2",
+    "vls": "^0.8.5"
   },
   "devDependencies": {
     "@babel/core": "^7.24.7",
