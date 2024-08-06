@@ -40,7 +40,6 @@ import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
-
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
@@ -314,9 +313,21 @@ const Home: React.FC<HomeProps> = () => {
           // User cancelled the connection, hence do nothing
           return;
         }
+        let errorMessage;
+        switch (true) {
+          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
+            error.message,
+          ):
+            errorMessage =
+              "Unsupported address type detected. Please use a Native SegWit or Taproot address.";
+            break;
+          default:
+            errorMessage = error.message;
+            break;
+        }
         showError({
           error: {
-            message: error.message,
+            message: errorMessage,
             errorState: ErrorState.WALLET,
             errorTime: new Date(),
           },
