@@ -2,7 +2,6 @@ import Image from "next/image";
 import React, { Fragment, useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
-import { IoCubeSharp } from "react-icons/io5";
 import { Tooltip } from "react-tooltip";
 
 import bitcoinWhite from "@/app/assets/bitcoin-white.svg";
@@ -43,12 +42,14 @@ const buildNextCapText = (
       title: "Staking Window",
       value: `${remainingBlocks} ${remainingBlocks == 1 ? "block" : "blocks"}`,
       icon: FaLock,
+      iconAfterText: undefined,
     };
   } else if (stakingCapSat) {
     return {
       title: "Next Staking TVL Cap",
-      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
+      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)}`,
       icon: undefined,
+      iconAfterText: undefined,
     };
   }
 };
@@ -71,13 +72,17 @@ const buildStakingCapSection = (
     return {
       title: "Staking Window",
       value: numOfBlockLeft > 0 ? `${numOfBlockLeft}` : "closed",
-      icon: FaLockOpen,
+      icon: numOfBlockLeft > 0 ? FaLockOpen : FaLock,
+      iconAfterText: undefined,
     };
   } else if (stakingCapSat) {
     return {
       title: "Staking TVL Cap",
-      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
-      icon: undefined,
+      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)}`,
+      icon: bitcoinWhite,
+      isIconSvg: true,
+      tooltipContent: "tset",
+      iconAfterText: undefined,
     };
   }
 };
@@ -102,9 +107,12 @@ export const Stats: React.FC<StatsProps> = ({
     value: string;
     icon?: any;
     iconAfterText?: any;
+    tooltipContent?: string;
+    isIconSvg?: boolean;
   }>({
     title: "Staking TVL Cap",
     value: "-",
+    iconAfterText: undefined,
   });
   const [isLoading, setIsLoading] = useState(true);
   const stakingStatsProvider = useStakingStats();
@@ -143,13 +151,7 @@ export const Stats: React.FC<StatsProps> = ({
 
   const sections = [
     [
-      {
-        title: stakingCapText.title,
-        value: stakingCapText.value,
-        icon: stakingCapText.icon,
-        iconAfterText: IoCubeSharp,
-        tooltipContent: "tooltip-content",
-      },
+      stakingCapText,
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
@@ -157,6 +159,7 @@ export const Stats: React.FC<StatsProps> = ({
           : 0,
         icon: bitcoinWhite,
         isIconSvg: true,
+        iconAfterText: undefined,
       },
       {
         title: "Pending Stake",
@@ -165,11 +168,12 @@ export const Stats: React.FC<StatsProps> = ({
           : 0,
         icon: bitcoinWhite,
         isIconSvg: true,
-        tooltip:
+        tooltipContent:
           stakingStats &&
           stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat < 0
             ? "Pending TVL can be negative when there are unbonding requests"
             : undefined,
+        iconAfterText: undefined,
       },
       {
         title: "YOUR TOTAL STAKE",
@@ -178,6 +182,7 @@ export const Stats: React.FC<StatsProps> = ({
           : 0,
         icon: bitcoinWhite,
         isIconSvg: true,
+        iconAfterText: undefined,
       },
     ],
   ];
