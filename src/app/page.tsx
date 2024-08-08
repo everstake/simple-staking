@@ -25,6 +25,7 @@ import {
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { signPsbtTransaction } from "./common/utils/psbt";
+import { ChainToggle } from "./components/ChainToggle/ChainToggle";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
@@ -40,7 +41,6 @@ import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
-
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
@@ -314,9 +314,21 @@ const Home: React.FC<HomeProps> = () => {
           // User cancelled the connection, hence do nothing
           return;
         }
+        let errorMessage;
+        switch (true) {
+          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
+            error.message,
+          ):
+            errorMessage =
+              "Unsupported address type detected. Please use a Native SegWit or Taproot address.";
+            break;
+          default:
+            errorMessage = error.message;
+            break;
+        }
         showError({
           error: {
-            message: error.message,
+            message: errorMessage,
             errorState: ErrorState.WALLET,
             errorTime: new Date(),
           },
@@ -402,7 +414,10 @@ const Home: React.FC<HomeProps> = () => {
         address={address}
         balanceSat={btcWalletBalanceSat}
       />
-      <div className="container mx-auto flex justify-center p-6">
+      <div className="container mx-auto flex flex-col gap-4 justify-center p-6">
+        <div className="md:ml-auto">
+          <ChainToggle />
+        </div>
         <div className="container flex flex-col gap-6">
           <Stats
             onConnect={handleConnectModal}
