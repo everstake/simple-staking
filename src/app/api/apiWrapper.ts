@@ -19,10 +19,24 @@ export const apiWrapper = async (
       throw new Error("Invalid method");
   }
 
-  const isTestnet = new URLSearchParams(window.location.search).has("testnet");
-  const baseURL = isTestnet
-    ? process.env.NEXT_PUBLIC_API_URL_TESTNET
-    : process.env.NEXT_PUBLIC_API_URL;
+  const searchParams = new URLSearchParams(window.location.search);
+  const chain = searchParams.get("chain");
+
+  let baseURL;
+  switch (chain) {
+    case "Signet":
+      baseURL = process.env.NEXT_PUBLIC_API_URL_SIGNET;
+      break;
+    case "Testnet":
+      baseURL = process.env.NEXT_PUBLIC_API_URL_TESTNET;
+      break;
+    case null:
+    case "Mainnet":
+    default:
+      baseURL = process.env.NEXT_PUBLIC_API_URL_MAINNET;
+      break;
+  }
+
   const fullURL = `${baseURL}${url}`;
 
   try {

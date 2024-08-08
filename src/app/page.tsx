@@ -25,6 +25,7 @@ import {
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { signPsbtTransaction } from "./common/utils/psbt";
+import { ChainToggle } from "./components/ChainToggle/ChainToggle";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
@@ -413,7 +414,10 @@ const Home: React.FC<HomeProps> = () => {
         address={address}
         balanceSat={btcWalletBalanceSat}
       />
-      <div className="container mx-auto flex justify-center p-6">
+      <div className="container mx-auto flex flex-col gap-4 justify-center p-6">
+        <div className="md:ml-auto">
+          <ChainToggle />
+        </div>
         <div className="container flex flex-col gap-6">
           <Stats
             onConnect={handleConnectModal}
