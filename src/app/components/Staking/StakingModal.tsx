@@ -488,6 +488,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         minStakingTimeBlocks,
         maxStakingTimeBlocks,
         unbondingTime,
+        confirmationDepth,
       } = stakingParams;
 
       // Staking time is fixed
@@ -605,17 +606,20 @@ export const StakingModal: React.FC<StakingModalProps> = ({
             >
               CONTINUE
             </button>
-            <PreviewModal
-              open={previewModalOpen}
-              onClose={setPreviewModalOpen}
-              onSign={handleSign}
-              finalityProvider={finalityProvider?.description.moniker}
-              stakingAmountSat={stakingAmountSat}
-              stakingTimeBlocks={stakingTimeBlocksWithFixed}
-              stakingFeeSat={stakingFeeSat}
-              feeRate={feeRate}
-              unbondingTimeBlocks={unbondingTime}
-            />
+            {previewReady && (
+              <PreviewModal
+                open={previewModalOpen}
+                onClose={setPreviewModalOpen}
+                onSign={handleSign}
+                finalityProvider={finalityProvider?.description.moniker}
+                stakingAmountSat={stakingAmountSat}
+                stakingTimeBlocks={stakingTimeBlocksWithFixed}
+                stakingFeeSat={stakingFeeSat}
+                confirmationDepth={confirmationDepth}
+                feeRate={feeRate}
+                unbondingTimeBlocks={unbondingTime}
+              />
+            )}
           </div>
         </>
       );

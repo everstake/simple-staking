@@ -1,8 +1,7 @@
 import { Network } from "@/utils/wallet/wallet_provider";
-const searchParams = new URLSearchParams(window.location.search);
-const chain = searchParams.get("chain");
 
-export const network = (chain?.toLowerCase() as Network) || Network.MAINNET;
+export const network =
+  (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.MAINNET;
 
 interface NetworkConfig {
   coinName: string;
