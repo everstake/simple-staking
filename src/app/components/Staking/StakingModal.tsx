@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
-import { Tooltip } from "react-tooltip";
-import { useLocalStorage } from "usehooks-ts";
+import { IoMdClose } from "react-icons/io";
 
-import {
-  OVERFLOW_HEIGHT_WARNING_THRESHOLD,
-  OVERFLOW_TVL_WARNING_THRESHOLD,
-} from "@/app/common/constants";
+import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
@@ -16,6 +12,7 @@ import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
+import { satoshiToBtc } from "@/utils/btcConversions";
 import {
   createStakingTx,
   signStakingTx,
@@ -29,12 +26,11 @@ import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
-import { FeedbackModal } from "../Modals/FeedbackModal";
+import { GeneralModal } from "../Modals/GeneralModal";
 import { PreviewModal } from "../Modals/PreviewModal";
 
-import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
+import { StakingAmount } from "./Form/StakingAmount";
 import { StakingFee } from "./Form/StakingFee";
-import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
@@ -47,31 +43,28 @@ interface OverflowProperties {
   approchingCapRange: boolean;
 }
 
-interface StakingProps {
+interface StakingModalProps {
+  open: boolean;
+  onClose: (value: boolean) => void;
   btcHeight: number | undefined;
-  finalityProviders: FinalityProviderInterface[] | undefined;
+  finalityProvider: FinalityProviderInterface;
   isWalletConnected: boolean;
   isLoading: boolean;
   onConnect: () => void;
-  finalityProvidersFetchNext: () => void;
-  finalityProvidersHasNext: boolean;
-  finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
   btcWalletBalanceSat: number;
   btcWalletNetwork: networks.Network | undefined;
   address: string | undefined;
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
+  onStakeSuccess: (value: string) => void;
 }
 
-export const Staking: React.FC<StakingProps> = ({
+export const StakingModal: React.FC<StakingModalProps> = ({
   btcHeight,
-  finalityProviders,
+  finalityProvider,
   isWalletConnected,
   onConnect,
-  finalityProvidersFetchNext,
-  finalityProvidersHasNext,
-  finalityProvidersIsFetchingMore,
   isLoading,
   btcWallet,
   btcWalletNetwork,
@@ -79,24 +72,19 @@ export const Staking: React.FC<StakingProps> = ({
   publicKeyNoCoord,
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
+  open,
+  onClose,
+  onStakeSuccess,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
-  const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
-  const [finalityProvider, setFinalityProvider] =
-    useState<FinalityProviderInterface>();
+  const [stakingTimeBlocks, setStakingTimeBlocks] = useState(64000);
   // Selected fee rate, comes from the user input
-  const [selectedFeeRate, setSelectedFeeRate] = useState(0);
+  const [selectedFeeRate, setSelectedFeeRate] = useState(1);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
-  const [feedbackModal, setFeedbackModal] = useState<{
-    type: "success" | "cancel" | null;
-    isOpen: boolean;
-  }>({ type: null, isOpen: false });
-  const [successFeedbackModalOpened, setSuccessFeedbackModalOpened] =
-    useLocalStorage<boolean>("bbn-staking-successFeedbackModalOpened", false);
-  const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
-    useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
+  const [termsChecked, setTermsChecked] = useState(false);
+  const [error, setError] = useState("");
   const [paramWithCtx, setParamWithCtx] = useState<
     ParamsWithContext | undefined
   >();
@@ -192,7 +180,7 @@ export const Staking: React.FC<StakingProps> = ({
         isHeightCap: false,
         overTheCapRange: stakingCapSat <= activeTVLSat,
         approchingCapRange:
-          stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
+          stakingCapSat * OVERFLOW_HEIGHT_WARNING_THRESHOLD < unconfirmedTVLSat,
       });
     }
   }, [paramWithCtx, btcHeight, stakingStats]);
@@ -251,12 +239,20 @@ export const Staking: React.FC<StakingProps> = ({
   ]);
 
   const handleResetState = () => {
-    setFinalityProvider(undefined);
     setStakingAmountSat(0);
-    setStakingTimeBlocks(0);
-    setSelectedFeeRate(0);
+    setStakingTimeBlocks(64000);
+    setSelectedFeeRate(defaultFeeRate);
     setPreviewModalOpen(false);
     setResetFormInputs(!resetFormInputs);
+    setTermsChecked(false);
+  };
+
+  const handleCheckboxChange = () => {
+    setTermsChecked(!termsChecked);
+  };
+
+  const handleError = (errorMessage: string) => {
+    setError(errorMessage);
   };
 
   const { minFeeRate, defaultFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
@@ -293,7 +289,10 @@ export const Staking: React.FC<StakingProps> = ({
         availableUTXOs,
       );
       // UI
-      handleFeedbackModal("success");
+      const stakingTxHash = Transaction.fromHex(stakingTxHex).getId();
+      const { mempoolApiUrl } = getNetworkConfig();
+      onStakeSuccess(`${mempoolApiUrl}/tx/${stakingTxHash}`);
+      onClose(false);
       handleLocalStorageDelegations(stakingTxHex, stakingTerm);
       handleResetState();
     } catch (error: Error | any) {
@@ -389,63 +388,12 @@ export const Staking: React.FC<StakingProps> = ({
     minFeeRate,
   ]);
 
-  // Select the finality provider from the list
-  const handleChooseFinalityProvider = (btcPkHex: string) => {
-    let found: FinalityProviderInterface | undefined;
-    try {
-      if (!finalityProviders) {
-        throw new Error("Finality providers not loaded");
-      }
-
-      found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
-      if (!found) {
-        throw new Error("Finality provider not found");
-      }
-
-      if (found.btcPk === publicKeyNoCoord) {
-        throw new Error(
-          "Cannot select a finality provider with the same public key as the wallet",
-        );
-      }
-    } catch (error: any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.STAKING,
-          errorTime: new Date(),
-        },
-        retryAction: () => handleChooseFinalityProvider(btcPkHex),
-      });
-      return;
-    }
-
-    setFinalityProvider(found);
-  };
-
   const handleStakingAmountSatChange = (inputAmountSat: number) => {
     setStakingAmountSat(inputAmountSat);
   };
 
   const handleStakingTimeBlocksChange = (inputTimeBlocks: number) => {
     setStakingTimeBlocks(inputTimeBlocks);
-  };
-
-  // Show feedback modal only once for each type
-  const handleFeedbackModal = (type: "success" | "cancel") => {
-    if (!feedbackModal.isOpen && feedbackModal.type !== type) {
-      const isFeedbackModalOpened =
-        type === "success"
-          ? successFeedbackModalOpened
-          : cancelFeedbackModalOpened;
-      if (!isFeedbackModalOpened) {
-        setFeedbackModal({ type, isOpen: true });
-      }
-    }
-  };
-
-  const handlePreviewModalClose = (isOpen: boolean) => {
-    setPreviewModalOpen(isOpen);
-    handleFeedbackModal("cancel");
   };
 
   const showOverflowWarning = (overflow: OverflowProperties) => {
@@ -474,15 +422,6 @@ export const Staking: React.FC<StakingProps> = ({
         />
       );
     }
-  };
-
-  const handleCloseFeedbackModal = () => {
-    if (feedbackModal.type === "success") {
-      setSuccessFeedbackModalOpened(true);
-    } else if (feedbackModal.type === "cancel") {
-      setCancelFeedbackModalOpened(true);
-    }
-    setFeedbackModal({ type: null, isOpen: false });
   };
 
   const showApproachingCapWarning = () => {
@@ -549,7 +488,6 @@ export const Staking: React.FC<StakingProps> = ({
         minStakingTimeBlocks,
         maxStakingTimeBlocks,
         unbondingTime,
-        confirmationDepth,
       } = stakingParams;
 
       // Staking time is fixed
@@ -577,63 +515,107 @@ export const Staking: React.FC<StakingProps> = ({
 
       return (
         <>
-          <p>Set up staking terms</p>
-          <div className="flex flex-1 flex-col">
-            <div className="flex flex-1 flex-col">
-              <StakingTime
-                minStakingTimeBlocks={minStakingTimeBlocks}
-                maxStakingTimeBlocks={maxStakingTimeBlocks}
-                unbondingTimeBlocks={stakingParams.unbondingTime}
-                onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
-                reset={resetFormInputs}
-              />
-              {/* <StakingAmount
-                minStakingAmountSat={minStakingAmountSat}
-                maxStakingAmountSat={maxStakingAmountSat}
-                btcWalletBalanceSat={btcWalletBalanceSat}
-                onStakingAmountSatChange={handleStakingAmountSatChange}
-                reset={resetFormInputs}
-              /> */}
-              {signReady && (
-                <StakingFee
-                  mempoolFeeRates={mempoolFeeRates}
-                  stakingFeeSat={stakingFeeSat}
-                  selectedFeeRate={selectedFeeRate}
-                  onSelectedFeeRateChange={setSelectedFeeRate}
-                  reset={resetFormInputs}
-                />
-              )}
-            </div>
-            {showApproachingCapWarning()}
-            <span
-              className="cursor-pointer text-xs"
-              data-tooltip-id="tooltip-staking-preview"
-              data-tooltip-content={signNotReadyReason}
-              data-tooltip-place="top"
-            >
+          <div className="flex flex-col items-center px-9 relative">
+            <div className="absolute right-4 -top-4">
               <button
-                className="btn-primary btn mt-2 w-full"
-                disabled={!previewReady}
-                onClick={() => setPreviewModalOpen(true)}
+                className="btn btn-circle btn-ghost btn-sm"
+                onClick={() => onClose(false)}
               >
-                Preview
+                <IoMdClose size={24} />
               </button>
-              <Tooltip id="tooltip-staking-preview" />
-            </span>
-            {previewReady && (
-              <PreviewModal
-                open={previewModalOpen}
-                onClose={handlePreviewModalClose}
-                onSign={handleSign}
-                finalityProvider={finalityProvider?.description.moniker}
-                stakingAmountSat={stakingAmountSat}
-                stakingTimeBlocks={stakingTimeBlocksWithFixed}
+            </div>
+            <div className="mb-8 flex flex-col gap-4">
+              <h3 className="text-center font-semibold text-xl uppercase">
+                Stake Bitcoin
+              </h3>
+            </div>
+
+            <StakingAmount
+              minStakingAmountSat={minStakingAmountSat}
+              maxStakingAmountSat={maxStakingAmountSat}
+              btcWalletBalanceSat={btcWalletBalanceSat}
+              onStakingAmountSatChange={handleStakingAmountSatChange}
+              onError={handleError}
+              reset={resetFormInputs}
+              stakingFeeSat={stakingFeeSat}
+            />
+            <div className="flex justify-between w-full mt-3 mb-14">
+              <p className="uppercase text-xs">
+                <span className="text-es-text-secondary">FEE: </span>
+                <span className="text-es-text font-medium">
+                  {`${satoshiToBtc(stakingFeeSat)} SATOSHIS`}
+                </span>
+              </p>
+              <p className="uppercase text-xs">
+                <span className="text-es-text-secondary">BALANCE: </span>
+                <span className="text-es-text font-medium">
+                  {satoshiToBtc(btcWalletBalanceSat)}
+                </span>
+              </p>
+            </div>
+            {signReady && (
+              <StakingFee
+                mempoolFeeRates={mempoolFeeRates}
                 stakingFeeSat={stakingFeeSat}
-                confirmationDepth={confirmationDepth}
-                feeRate={feeRate}
-                unbondingTimeBlocks={unbondingTime}
+                selectedFeeRate={selectedFeeRate}
+                onSelectedFeeRateChange={setSelectedFeeRate}
+                reset={resetFormInputs}
               />
             )}
+          </div>
+
+          <div className="mt-auto">
+            <div
+              className={` py-5 px-9 bg-es-bg ${!!error ? "border-t border-t-es-error" : ""}`}
+            >
+              {!error && (
+                <div className="flex gap-1 items-center">
+                  <input
+                    className="checkbox-primary checkbox"
+                    type="checkbox"
+                    name="terms"
+                    onChange={handleCheckboxChange}
+                    checked={termsChecked}
+                  />
+                  <span className="text-es-text-secondary">
+                    By staking, you agree to our{" "}
+                    <a
+                      href="/"
+                      className="underline text-es-text md:hover:no-underline"
+                    >
+                      Terms of Use
+                    </a>
+                  </span>
+                </div>
+              )}
+              {error && (
+                <p className="text-center text-sm text-es-text-secondary">
+                  {error}
+                </p>
+              )}
+            </div>
+            <button
+              className={`border-es-accent border font-medium text-3xl text-center h-20 w-full text-es-black bg-es-accent md:transition-colors disabled:opacity-70 ${
+                signReady && termsChecked
+                  ? "md:hover:bg-es-black md:hover:text-es-accent"
+                  : ""
+              }`}
+              onClick={() => setPreviewModalOpen(true)}
+              disabled={!signReady || !termsChecked}
+            >
+              CONTINUE
+            </button>
+            <PreviewModal
+              open={previewModalOpen}
+              onClose={setPreviewModalOpen}
+              onSign={handleSign}
+              finalityProvider={finalityProvider?.description.moniker}
+              stakingAmountSat={stakingAmountSat}
+              stakingTimeBlocks={stakingTimeBlocksWithFixed}
+              stakingFeeSat={stakingFeeSat}
+              feeRate={feeRate}
+              unbondingTimeBlocks={unbondingTime}
+            />
           </div>
         </>
       );
@@ -641,31 +623,16 @@ export const Staking: React.FC<StakingProps> = ({
   };
 
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
-      <h3 className="mb-4 font-bold">Staking</h3>
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
-          <FinalityProviders
-            finalityProviders={finalityProviders}
-            selectedFinalityProvider={finalityProvider}
-            onFinalityProviderChange={handleChooseFinalityProvider}
-            queryMeta={{
-              next: finalityProvidersFetchNext,
-              hasMore: finalityProvidersHasNext,
-              isFetchingMore: finalityProvidersIsFetchingMore,
-            }}
-          />
-        </div>
-        <div className="divider m-0 lg:divider-horizontal lg:m-0" />
-        <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
-          {renderStakingForm()}
-        </div>
+    <GeneralModal
+      open={open}
+      onClose={onClose}
+      classNames={{
+        modal: "stake-modal",
+      }}
+    >
+      <div className="flex flex-col flex-grow mt-8 md:max-w-[480px] ">
+        {renderStakingForm()}
       </div>
-      <FeedbackModal
-        open={feedbackModal.isOpen}
-        onClose={handleCloseFeedbackModal}
-        type={feedbackModal.type}
-      />
-    </div>
+    </GeneralModal>
   );
 };

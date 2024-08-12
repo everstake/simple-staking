@@ -13,6 +13,7 @@ import {
 } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { getNetworkConfig } from "@/config/network.config";
 import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
@@ -40,6 +41,8 @@ interface DelegationsProps {
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
   getNetworkFees: WalletProvider["getNetworkFees"];
+  onSuccessWithdraw: (txHex: string) => void;
+  onSuccessUnbond: (txHex: string) => void;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -54,11 +57,15 @@ export const Delegations: React.FC<DelegationsProps> = ({
   pushTx,
   queryMeta,
   getNetworkFees,
+  onSuccessWithdraw,
+  onSuccessUnbond,
 }) => {
+  const [stakingFeeRate, setStakingFeeRate] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
+  const { mempoolApiUrl } = getNetworkConfig();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -105,6 +112,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       );
       // Update the local state with the new intermediate delegation
       updateLocalStorage(delegation, DelegationState.INTERMEDIATE_UNBONDING);
+      onSuccessUnbond(`${mempoolApiUrl}/tx/${txID}`);
     } catch (error: Error | any) {
       showError({
         error: {
@@ -138,6 +146,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       );
       // Update the local state with the new intermediate delegation
       updateLocalStorage(delegation, DelegationState.INTERMEDIATE_WITHDRAWAL);
+      onSuccessWithdraw(`${mempoolApiUrl}/tx/${txID}`);
     } catch (error: Error | any) {
       showError({
         error: {
@@ -158,6 +167,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
+  };
+
+  const handleStakingFeeRateChange = (feeRate: number) => {
+    setStakingFeeRate(feeRate);
   };
 
   useEffect(() => {
@@ -212,27 +225,41 @@ export const Delegations: React.FC<DelegationsProps> = ({
       delegationsLocalStorage;
 
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
-      <h3 className="mb-4 font-bold">Staking history</h3>
+    <div className=" flex flex-col lg:flex-1 ">
+      <div className="border border-es-border py-7 px-6">
+        <h3 className="font-bold text-xl text-es-text uppercase">
+          TRANSACTION HISTORY
+        </h3>
+      </div>
       {combinedDelegationsData.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-content p-4 text-center dark:border-neutral-content/20">
+        <div className="rounded-2xl border border-neutral-content p-4 text-center">
           <p>No history found</p>
         </div>
       ) : (
         <>
-          <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
-            <p>Amount</p>
-            <p>Inception</p>
-            <p className="text-center">Transaction hash</p>
-            <p className="text-center">Status</p>
-            <p>Action</p>
+          <div className="hidden grid-cols-5 gap-2 px-6 lg:grid border border-es-border border-t-0">
+            <p className="p-5 uppercase text-center text-sm font-medium text-es-text-secondary border-r border-r-es-border">
+              DATE
+            </p>
+            <p className="p-5 uppercase text-center text-sm font-medium text-es-text-secondary border-r border-r-es-border">
+              Amount
+            </p>
+            <p className="p-5 uppercase text-center text-sm font-medium text-es-text-secondary border-r border-r-es-border">
+              Transaction hash
+            </p>
+            <p className="p-5 uppercase text-center text-sm font-medium text-es-text-secondary ">
+              Status
+            </p>
+            <p className="p-5 uppercase text-center text-sm font-medium text-es-text-secondary border-l border-l-es-border">
+              Action
+            </p>
           </div>
           <div
             id="staking-history"
             className="no-scrollbar max-h-[21rem] overflow-y-auto"
           >
             <InfiniteScroll
-              className="flex flex-col gap-4 pt-3"
+              className="flex flex-col"
               dataLength={combinedDelegationsData.length}
               next={queryMeta.next}
               hasMore={queryMeta.hasMore}

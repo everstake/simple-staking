@@ -1,5 +1,7 @@
+import Image from "next/image";
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
+import bitcoinWhite from "@/app/assets/bitcoin-white.svg";
 import { getNetworkConfig } from "@/config/network.config";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -11,7 +13,9 @@ interface StakingAmountProps {
   maxStakingAmountSat: number;
   btcWalletBalanceSat: number;
   onStakingAmountSatChange: (inputAmountSat: number) => void;
+  onError?: (error: string) => void;
   reset: boolean;
+  stakingFeeSat: number;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
@@ -19,35 +23,58 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   maxStakingAmountSat,
   btcWalletBalanceSat,
   onStakingAmountSatChange,
+  onError = () => {},
   reset,
+  stakingFeeSat,
 }) => {
-  const [value, setValue] = useState("");
+  const initialStakingValue = () => {
+    const walletBalanceAfterFeeSat = btcWalletBalanceSat - stakingFeeSat;
+    const maxValueAfterFee =
+      walletBalanceAfterFeeSat > maxStakingAmountSat
+        ? maxStakingAmountSat
+        : walletBalanceAfterFeeSat;
+    onStakingAmountSatChange(maxValueAfterFee);
+    return maxDecimals(satoshiToBtc(maxValueAfterFee), 8).toString();
+  };
+
+  const [value, setValue] = useState(initialStakingValue);
   const [error, setError] = useState("");
-  // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
+  const [isMinActive, setIsMinActive] = useState(false);
+  const [isMaxActive, setIsMaxActive] = useState(true);
 
   const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
-
   const { coinName } = getNetworkConfig();
 
-  // Use effect to reset the state when reset prop changes
   useEffect(() => {
-    setValue("");
+    const initialValue = initialStakingValue();
+    setValue(initialValue);
     setError("");
     setTouched(false);
-  }, [reset]);
+    onError("");
+    updateButtonStates(initialValue);
+  }, [reset, minStakingAmountSat]);
+
+  const updateButtonStates = (newValue: string) => {
+    const numValue = parseFloat(newValue);
+    const satoshis = btcToSatoshi(numValue);
+
+    setIsMinActive(satoshis === minStakingAmountSat);
+    setIsMaxActive(satoshis === maxStakingAmountSat);
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-
-    // Allow the input to be changed freely
     setValue(newValue);
 
     if (touched && newValue === "") {
-      setError(generalErrorMessage);
+      const errorMsg = generalErrorMessage;
+      setError(errorMsg);
+      onError(errorMsg);
     } else {
       setError("");
+      onError("");
     }
   };
 
@@ -55,15 +82,16 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     setTouched(true);
 
     if (value === "") {
+      const errorMsg = generalErrorMessage;
       onStakingAmountSatChange(0);
-      setError(generalErrorMessage);
+      setError(errorMsg);
+      onError(errorMsg);
       return;
     }
 
     const numValue = parseFloat(value);
     const satoshis = btcToSatoshi(numValue);
 
-    // Run all validations
     const validations = [
       {
         valid: !isNaN(Number(value)),
@@ -91,42 +119,91 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       },
     ];
 
-    // Find the first failing validation
     const firstInvalid = validations.find((validation) => !validation.valid);
 
     if (firstInvalid) {
+      const errorMsg = firstInvalid.message;
       onStakingAmountSatChange(0);
-      setError(firstInvalid.message);
+      setError(errorMsg);
+      onError(errorMsg);
     } else {
       setError("");
+      onError("");
       onStakingAmountSatChange(satoshis);
       setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
+
+    updateButtonStates(value);
   };
 
-  const minStakeAmount = maxDecimals(satoshiToBtc(minStakingAmountSat), 8);
-  const maxStakeAmount = maxDecimals(satoshiToBtc(maxStakingAmountSat), 8);
+  const handleMaxClick = () => {
+    setError("");
+    onError("");
+
+    const walletBalanceAfterFeeSat = btcWalletBalanceSat - stakingFeeSat;
+    const maxValueAfterFee =
+      walletBalanceAfterFeeSat > maxStakingAmountSat
+        ? maxStakingAmountSat
+        : walletBalanceAfterFeeSat;
+
+    const maxValue = maxDecimals(
+      satoshiToBtc(maxValueAfterFee < 0 ? 0 : maxValueAfterFee),
+      8,
+    ).toString();
+
+    setValue(maxValue);
+    onStakingAmountSatChange(maxValueAfterFee < 0 ? 0 : maxValueAfterFee);
+    updateButtonStates(maxValue);
+  };
+
+  const handleMinClick = () => {
+    setError("");
+    onError("");
+    const minValue = maxDecimals(
+      satoshiToBtc(minStakingAmountSat),
+      8,
+    ).toString();
+    setValue(minValue);
+    onStakingAmountSatChange(minStakingAmountSat);
+    updateButtonStates(minValue);
+  };
+
   return (
-    <label className="form-control w-full flex-1">
-      <div className="label pt-0">
-        <span className="label-text-alt text-base">Amount</span>
-        <span className="label-text-alt opacity-50">
-          min/max: {minStakeAmount}/{maxStakeAmount} {coinName}
-        </span>
+    <div
+      className={`flex items-center gap-3 w-full pb-2 border-b  ${!!error ? "border-b-es-error" : "border-b-es-border"}`}
+    >
+      <div className="w-10 flex items-center">
+        <Image
+          src={bitcoinWhite}
+          className="opacity-70"
+          style={{ width: "24px" }}
+          alt="bitcoin-white"
+        />
       </div>
-      <input
-        type="string"
-        className={`no-focus input input-bordered w-full ${error && "input-error"}`}
-        value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        placeholder={coinName}
-      />
-      {error && (
-        <div className="my-2 min-h-[20px]">
-          <p className="text-center text-sm text-error">{error}</p>
-        </div>
-      )}
-    </label>
+      <label className="form-control w-full flex-1">
+        <input
+          type="string"
+          className={`w-full bg-transparent text-center text-5xl font-bold ${error && "input-error"}`}
+          value={value}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder={coinName}
+        />
+      </label>
+      <div className="flex flex-col w-12">
+        <button
+          className={`bg-none font-medium text-xs uppercase py-1 px-2 border border-es-border border-b-0  md:hover:opacity-70 md:transition-opacity ${isMaxActive ? "text-es-accent" : "text-es-text-secondary"}`}
+          onClick={handleMaxClick}
+        >
+          max
+        </button>
+        <button
+          className={`bg-none font-medium text-xs uppercase py-1 px-2 border border-es-border  md:hover:opacity-70 md:transition-opacity ${isMinActive ? "text-es-accent" : "text-es-text-secondary"}`}
+          onClick={handleMinClick}
+        >
+          min
+        </button>
+      </div>
+    </div>
   );
 };

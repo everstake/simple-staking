@@ -69,7 +69,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           )}
         </div>
         <button
-          className="btn btn-sm btn-link no-underline"
+          className="btn btn-sm btn-link no-underline text-es-accent"
           onClick={() => setCustomMode(true)}
           disabled={!mempoolFeeRates || !stakingFeeSat}
         >
@@ -104,7 +104,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             min={minFeeRate}
             max={maxFeeRate}
             value={selectedFeeRate || defaultFeeRate}
-            className={`range range-xs my-2 opacity-60 ${showLowFeesWarning ? "range-error" : "range-primary"}`}
+            className={`range range-xs my-2 ${showLowFeesWarning ? "range-error" : "range-primary"}`}
             onChange={handleSliderChange}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
@@ -125,7 +125,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   const customModeReady = customMode && mempoolFeeRates && stakingFeeSat;
 
   return (
-    <div className="my-2 text-sm">
+    <div className="my-2 text-sm w-full">
       {customModeReady ? selectedModeRender() : defaultModeRender()}
     </div>
   );
