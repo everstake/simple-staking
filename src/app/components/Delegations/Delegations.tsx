@@ -232,7 +232,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         </h3>
       </div>
       {combinedDelegationsData.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-content p-4 text-center">
+        <div className="border border-es-border border-t-0 p-4 text-center">
           <p>No history found</p>
         </div>
       ) : (
