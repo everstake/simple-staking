@@ -5,7 +5,7 @@ export const ChainToggle: React.FC = () => {
   const [mounted, setMounted] = useState(false);
   const CHAINS = [
     { name: "mainnet", url: "https://btc-staking.everstake.one" },
-    { name: "signet", url: "https://btc-staking.testnet.everstake.one" },
+    { name: "signet", url: "https://btc-staking-testnet.everstake.one" },
   ];
   const [selectedValue, setSelectedValue] = useState<{
     label: string;
