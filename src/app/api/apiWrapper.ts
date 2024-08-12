@@ -5,6 +5,7 @@ export const apiWrapper = async (
   url: string,
   generalErrorMessage: string,
   params?: any,
+  timeout?: number,
 ) => {
   let response;
   let handler;
@@ -18,35 +19,23 @@ export const apiWrapper = async (
     default:
       throw new Error("Invalid method");
   }
-
-  const searchParams = new URLSearchParams(window.location.search);
-  const chain = searchParams.get("chain");
-
-  let baseURL;
-  switch (chain) {
-    case "Signet":
-      baseURL = process.env.NEXT_PUBLIC_API_URL_SIGNET;
-      break;
-    case "Testnet":
-      baseURL = process.env.NEXT_PUBLIC_API_URL_TESTNET;
-      break;
-    case null:
-    case "Mainnet":
-    default:
-      baseURL = process.env.NEXT_PUBLIC_API_URL_MAINNET;
-      break;
-  }
-
-  const fullURL = `${baseURL}${url}`;
+  const isTestnet = new URLSearchParams(window.location.search).has("testnet");
+  const baseURL = isTestnet
+    ? process.env.NEXT_PUBLIC_API_URL_TESTNET
+    : process.env.NEXT_PUBLIC_API_URL;
 
   try {
+    // destructure params in case of post request
     response = await handler(
-      fullURL,
+      `${baseURL}${url}`,
       method === "POST"
         ? { ...params }
         : {
             params,
           },
+      {
+        timeout: timeout || 0, // 0 is no timeout
+      },
     );
   } catch (error) {
     if (axios.isAxiosError(error)) {
