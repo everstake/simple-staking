@@ -149,6 +149,8 @@ export const Stats: React.FC<StatsProps> = ({
     maximumFractionDigits: 2,
   });
 
+  const balancesAreNonZero = totalPendingSat + totalStakedSat > 0;
+
   const sections = [
     [
       stakingCapText,
@@ -252,7 +254,12 @@ export const Stats: React.FC<StatsProps> = ({
           </div>
         ))}
       </div>
-      <Controls onStaking={onStaking} onConnect={onConnect} address={address} />
+      <Controls
+        onStaking={onStaking}
+        onConnect={onConnect}
+        address={address}
+        balancesAreNonZero={balancesAreNonZero}
+      />
     </div>
   );
 };
