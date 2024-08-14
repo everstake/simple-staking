@@ -1,21 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 
 export const ChainToggle: React.FC = () => {
   const [mounted, setMounted] = useState(false);
   const CHAINS = [
-    { name: "mainnet", url: "https://btc-staking.everstake.one" },
-    { name: "signet", url: "https://btc-staking-testnet.everstake.one" },
+    {
+      name: "Mainnet",
+      chainName: "mainnet",
+      url: "https://btc-staking.everstake.one",
+    },
+    {
+      name: "testnet signet",
+      chainName: "signet",
+      url: "https://btc-staking-testnet.everstake.one",
+    },
   ];
   const [selectedValue, setSelectedValue] = useState<{
     label: string;
     value: string;
   }>({ label: CHAINS[0].name, value: CHAINS[0].name });
 
+  const selectRef = useRef<any>(null);
+
   useEffect(() => {
     const currentChain = process.env.NEXT_PUBLIC_NETWORK;
 
-    const foundChain = CHAINS.find((chain) => chain.name === currentChain);
+    const foundChain = CHAINS.find((chain) => chain.chainName === currentChain);
 
     if (foundChain) {
       setSelectedValue({ label: foundChain.name, value: foundChain.name });
@@ -35,6 +45,7 @@ export const ChainToggle: React.FC = () => {
         window.location.href = selectedChain.url;
       }
     }
+    selectRef.current.blur();
   };
 
   if (!mounted) {
@@ -48,6 +59,7 @@ export const ChainToggle: React.FC = () => {
 
   return (
     <Select
+      ref={selectRef}
       value={selectedValue}
       onChange={handleChange}
       options={options}
@@ -55,11 +67,28 @@ export const ChainToggle: React.FC = () => {
       isSearchable={false}
       classNames={{
         control: (state) =>
-          "border border-es-border bg-transparent px-3 py-2 min-w-[173px] cursor-pointer uppercase text-xs font-bold",
+          "border border-es-border bg-transparent px-3 py-2 min-w-[180px] cursor-pointer uppercase text-xs font-bold",
         menu: (state) => "bg-es-bg border-x border-es-border text-xs",
-        option: () =>
-          "border-b border-es-border p-2 cursor-pointer md:hover:text-es-accent uppercase text-sm	 font-bold",
-        singleValue: () => "text-xs",
+        option: ({ isSelected }) =>
+          `border-b border-es-border p-2 cursor-pointer uppercase text-sm font-bold ${
+            isSelected ? "text-es-accent disabled" : "md:hover:text-es-accent"
+          }`,
+        singleValue: (state) => `text-xs `,
+        dropdownIndicator: (state) => (state.isFocused ? "rotate-180" : ""),
+      }}
+      styles={{
+        control: (baseStyles, state) => ({
+          ...baseStyles,
+          cursor: "pointer",
+        }),
+        menu: (baseStyles, state) => ({
+          ...baseStyles,
+          cursor: "pointer",
+        }),
+        option: (baseStyles, state) => ({
+          ...baseStyles,
+          cursor: state.isFocused ? "unset" : "pointer",
+        }),
       }}
     />
   );
