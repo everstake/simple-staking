@@ -167,7 +167,7 @@ body.modal-open {
 }
 
 .stake-modal--big-h {
-  min-height: 480px !important;
+  max-height: 480px !important;
 }
 
 .unbond-modal {
