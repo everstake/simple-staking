@@ -452,6 +452,7 @@ export const Staking: React.FC<StakingProps> = ({
     if (overflow.isHeightCap) {
       return (
         <Message
+          onClose={() => {}}
           title="Staking window closed"
           messages={[
             "Staking is temporarily disabled due to the staking window being closed.",
@@ -464,6 +465,7 @@ export const Staking: React.FC<StakingProps> = ({
     } else {
       return (
         <Message
+          onClose={() => {}}
           title="Staking cap reached"
           messages={[
             "Staking is temporarily disabled due to the staking cap getting reached.",
@@ -517,6 +519,7 @@ export const Staking: React.FC<StakingProps> = ({
     else if (isBlockHeightUnderActivation) {
       return (
         <Message
+          onClose={() => {}}
           title="Staking has not yet started"
           messages={[
             `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${btcHeight || "-"}.`,
@@ -529,6 +532,7 @@ export const Staking: React.FC<StakingProps> = ({
     else if (isUpgrading) {
       return (
         <Message
+          onClose={() => {}}
           title="Staking parameters upgrading"
           messages={[
             "The staking parameters are getting upgraded, staking will be re-enabled soon.",
