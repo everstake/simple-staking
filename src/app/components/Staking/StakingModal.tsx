@@ -346,7 +346,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
           paramWithCtx.currentVersion,
-          stakingAmountSat,
+          paramWithCtx.currentVersion.minStakingAmountSat,
           stakingTimeBlocks,
           finalityProvider.btcPk,
           btcWalletNetwork,
@@ -358,14 +358,14 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         return stakingFeeSat;
       } catch (error: Error | any) {
         // fees + staking amount can be more than the balance
-        showError({
-          error: {
-            message: error.message,
-            errorState: ErrorState.STAKING,
-            errorTime: new Date(),
-          },
-          retryAction: () => setSelectedFeeRate(0),
-        });
+        // showError({
+        //   error: {
+        //     message: error.message,
+        //     errorState: ErrorState.STAKING,
+        //     errorTime: new Date(),
+        //   },
+        //   retryAction: () => setSelectedFeeRate(0),
+        // });
         setSelectedFeeRate(0);
         return 0;
       }
@@ -381,11 +381,11 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     finalityProvider,
     paramWithCtx,
     mempoolFeeRates,
-    selectedFeeRate,
     availableUTXOs,
     showError,
     defaultFeeRate,
     minFeeRate,
+    selectedFeeRate,
   ]);
 
   const handleStakingAmountSatChange = (inputAmountSat: number) => {
@@ -402,6 +402,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     if (overflow.isHeightCap || isBlockHeightUnderActivation || isUpgrading) {
       setOverflowWarningVisible(true);
     }
+    setOverflowWarningVisible(false);
   }, [overflow.isHeightCap, isBlockHeightUnderActivation, isUpgrading]);
 
   const showOverflowWarning = (overflow: OverflowProperties) => {
@@ -528,7 +529,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
 
       return (
         <>
-          <div className="flex flex-col items-center px-9 relative min-h-[480px]">
+          <div className="flex flex-col items-center px-9 relative">
             <div className="absolute right-4 -top-4">
               <button
                 className="btn btn-circle btn-ghost btn-sm"
@@ -602,9 +603,10 @@ export const StakingModal: React.FC<StakingModalProps> = ({
                 </div>
               )}
               {error && (
-                <p className="text-center text-sm text-es-text-secondary">
-                  {error}
-                </p>
+                <p
+                  dangerouslySetInnerHTML={{ __html: error }}
+                  className="text-center text-sm text-es-text-secondary"
+                ></p>
               )}
             </div>
             <button
@@ -616,7 +618,9 @@ export const StakingModal: React.FC<StakingModalProps> = ({
               onClick={() => setPreviewModalOpen(true)}
               disabled={!signReady || !termsChecked}
             >
-              CONTINUE
+              {btcWalletBalanceSat > minStakingAmountSat
+                ? "CONTINUE"
+                : "TOP-UP YOUR BALANCE"}
             </button>
             {previewReady && (
               <PreviewModal
