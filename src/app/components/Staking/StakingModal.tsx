@@ -396,10 +396,19 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     setStakingTimeBlocks(inputTimeBlocks);
   };
 
+  const [overflowWarningVisible, setOverflowWarningVisible] = useState(false);
+
+  useEffect(() => {
+    if (overflow.isHeightCap || isBlockHeightUnderActivation || isUpgrading) {
+      setOverflowWarningVisible(true);
+    }
+  }, [overflow.isHeightCap, isBlockHeightUnderActivation, isUpgrading]);
+
   const showOverflowWarning = (overflow: OverflowProperties) => {
     if (overflow.isHeightCap) {
       return (
         <Message
+          onClose={onClose}
           title="Staking window closed"
           messages={[
             "Staking is temporarily disabled due to the staking window being closed.",
@@ -412,6 +421,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     } else {
       return (
         <Message
+          onClose={onClose}
           title="Staking cap reached"
           messages={[
             "Staking is temporarily disabled due to the staking cap getting reached.",
@@ -456,6 +466,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     else if (isBlockHeightUnderActivation) {
       return (
         <Message
+          onClose={onClose}
           title="Staking has not yet started"
           messages={[
             `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${btcHeight || "-"}.`,
@@ -468,6 +479,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     else if (isUpgrading) {
       return (
         <Message
+          onClose={onClose}
           title="Staking parameters upgrading"
           messages={[
             "The staking parameters are getting upgraded, staking will be re-enabled soon.",
@@ -516,7 +528,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
 
       return (
         <>
-          <div className="flex flex-col items-center px-9 relative">
+          <div className="flex flex-col items-center px-9 relative min-h-[480px]">
             <div className="absolute right-4 -top-4">
               <button
                 className="btn btn-circle btn-ghost btn-sm"
@@ -631,10 +643,10 @@ export const StakingModal: React.FC<StakingModalProps> = ({
       open={open}
       onClose={onClose}
       classNames={{
-        modal: "stake-modal",
+        modal: `stake-modal ${overflowWarningVisible ? "stake-modal--small-h" : "stake-modal--big-h"}`,
       }}
     >
-      <div className="flex flex-col flex-grow mt-8 md:max-w-[480px] ">
+      <div className="flex flex-col flex-grow mt-8 md:max-w-[480px]">
         {renderStakingForm()}
       </div>
     </GeneralModal>

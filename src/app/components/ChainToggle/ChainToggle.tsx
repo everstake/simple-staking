@@ -59,7 +59,7 @@ export const ChainToggle: React.FC = () => {
 
   return (
     <Select
-      ref={selectRef} // Привязываем реф к Select
+      ref={selectRef}
       value={selectedValue}
       onChange={handleChange}
       options={options}
