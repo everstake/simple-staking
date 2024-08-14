@@ -355,7 +355,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
           memoizedFeeRate,
           availableUTXOs,
         );
-        return stakingFeeSat;
+        return stakingFeeSat * 2;
       } catch (error: Error | any) {
         // fees + staking amount can be more than the balance
         // showError({

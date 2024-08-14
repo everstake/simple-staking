@@ -58,7 +58,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     setTouched(false);
     onError("");
     updateButtonStates(initialValue);
-    handleBlur();
   }, [reset, minStakingAmountSat]);
 
   useEffect(() => {
@@ -109,7 +108,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
     const numValue = parseFloat(value);
     const satoshis = btcToSatoshi(numValue);
-
     const validations = [
       {
         valid: !isNaN(Number(value)),
@@ -120,8 +118,12 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         message: `${errorLabel} must be greater than 0.`,
       },
       {
-        valid: satoshis < minStakingAmountSat,
+        valid: btcWalletBalanceSat > minStakingAmountSat,
         message: `Insufficient wallet balance. <br/> Minimum staking amount is ${satoshiToBtc(minStakingAmountSat)} BTC.`,
+      },
+      {
+        valid: satoshis >= minStakingAmountSat,
+        message: `${errorLabel} must be at least ${satoshiToBtc(minStakingAmountSat)} ${coinName}.`,
       },
       {
         valid: satoshis <= maxStakingAmountSat,
@@ -175,7 +177,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     setValue(maxValue);
     onStakingAmountSatChange(maxValueAfterFee < 0 ? 0 : maxValueAfterFee);
     updateButtonStates(maxValue);
-    handleBlur();
   };
 
   const handleMinClick = () => {
@@ -188,7 +189,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     setValue(minValue);
     onStakingAmountSatChange(minStakingAmountSat);
     updateButtonStates(minValue);
-    handleBlur();
   };
 
   return (
