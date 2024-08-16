@@ -346,7 +346,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
           paramWithCtx.currentVersion,
-          paramWithCtx.currentVersion.minStakingAmountSat,
+          stakingAmountSat,
           stakingTimeBlocks,
           finalityProvider.btcPk,
           btcWalletNetwork,
@@ -355,18 +355,27 @@ export const StakingModal: React.FC<StakingModalProps> = ({
           memoizedFeeRate,
           availableUTXOs,
         );
-        return stakingFeeSat * 2;
+        console.log(stakingAmountSat);
+        console.log(
+          "memoizedFeeRate",
+          memoizedFeeRate,
+          defaultFeeRate,
+          stakingFeeSat,
+        );
+        return stakingFeeSat;
       } catch (error: Error | any) {
+        console.log(error);
+        console.log("estimate fee failed");
         // fees + staking amount can be more than the balance
-        // showError({
-        //   error: {
-        //     message: error.message,
-        //     errorState: ErrorState.STAKING,
-        //     errorTime: new Date(),
-        //   },
-        //   retryAction: () => setSelectedFeeRate(0),
-        // });
-        setSelectedFeeRate(0);
+        showError({
+          error: {
+            message: error.message,
+            errorState: ErrorState.STAKING,
+            errorTime: new Date(),
+          },
+          retryAction: () => setSelectedFeeRate(defaultFeeRate),
+        });
+        setSelectedFeeRate(defaultFeeRate);
         return 0;
       }
     } else {
