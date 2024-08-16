@@ -204,7 +204,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           <span className="label-text text-es-text-secondary text-base">
             By connecting your wallet, you agree to our Terms of Use and{" "}
             <a
-              href="/babylonchain_terms_of_use.doc"
+              href="https://everstake.one/docs/terms-of-use.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="sublink text-es-text underline"
@@ -213,7 +213,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             </a>
             and
             <a
-              href="/babylonchain_terms_of_use.doc"
+              href="https://everstake.one/docs/privacy-policy.pdf"
               target="_blank"
               rel="noopener noreferrer"
               className="sublink text-es-text underline"

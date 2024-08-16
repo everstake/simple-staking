@@ -603,7 +603,8 @@ export const StakingModal: React.FC<StakingModalProps> = ({
                   <span className="text-es-text-secondary">
                     By staking, you agree to our{" "}
                     <a
-                      href="/"
+                      href="https://everstake.one/docs/terms-of-use.pdf"
+                      target="_blank"
                       className="underline text-es-text md:hover:no-underline"
                     >
                       Terms of Use
