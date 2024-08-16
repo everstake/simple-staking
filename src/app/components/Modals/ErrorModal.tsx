@@ -1,10 +1,6 @@
-import { format } from "date-fns";
-import { IoMdClose } from "react-icons/io";
-
+import { Toast } from "@/app/components/Toast/Toast";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState, ShowErrorParams } from "@/app/types/errors";
-
-import { GeneralModal } from "./GeneralModal";
 
 interface ErrorModalProps {
   open: boolean;
@@ -18,10 +14,8 @@ interface ErrorModalProps {
 export const ErrorModal: React.FC<ErrorModalProps> = ({
   open,
   onClose,
-  onRetry,
   errorMessage,
   errorState,
-  errorTime,
 }) => {
   const { error, retryErrorAction } = useError();
 
@@ -78,41 +72,12 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     }
   };
 
-  const formattedErrorTime = format(errorTime, "dd MMMM yyyy 'at' HH:mm:ss");
-
   return (
-    <GeneralModal
+    <Toast
       open={open}
+      title={getErrorTitle()}
+      desc={getErrorMessage()}
       onClose={onClose}
-      classNames={{ modal: "bg-es-bg" }}
-    >
-      <div className="mb- flex items-center justify-end">
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose()}
-        >
-          <IoMdClose size={24} />
-        </button>
-      </div>
-      <div className="flex flex-col justify-center gap-4">
-        <h3 className="text-xl uppercase text-center font-semibold text-error">
-          {getErrorTitle()}
-        </h3>
-        <div className="flex flex-col gap-3">
-          <p className="text-medium text-sm text-es-text-hint">
-            {getErrorMessage()}
-          </p>
-          <p className="text-center text-xs opacity-50">{formattedErrorTime}</p>
-        </div>
-        <div className="mt-4 flex justify-around gap-4">
-          <button className="es-button-secondary" onClick={() => onClose()}>
-            Cancel
-          </button>
-          <button className="es-button" onClick={handleRetry}>
-            Try Again
-          </button>
-        </div>
-      </div>
-    </GeneralModal>
+    />
   );
 };
