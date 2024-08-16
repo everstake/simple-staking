@@ -76,7 +76,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   useEffect(() => {
     const numValue = parseFloat(value);
     const satoshis = btcToSatoshi(numValue);
-    console.log("updateButtonStates", value);
     const walletBalanceAfterFeeSat =
       btcWalletBalanceSat - getFeeFromValueSat(btcWalletBalanceSat);
     const maxValueAfterFee =
@@ -87,26 +86,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     const maxValue = maxDecimals(maxValueAfterFee, 0);
 
     setIsMinActive(satoshis === minStakingAmountSat);
-    console.log("ISMAX ACTIVE", satoshis === maxValue);
     setIsMaxActive(satoshis === maxStakingAmountSat || satoshis === maxValue);
-    console.log("TTT", false || true);
   }, [value, btcWalletBalanceSat, maxStakingAmountSat]);
-
-  // const updateButtonStates = () => {
-  //   const numValue = parseFloat(value);
-  //   const satoshis = btcToSatoshi(numValue);
-  //   console.log('updateButtonStates', value)
-  //   const walletBalanceAfterFeeSat = btcWalletBalanceSat - getFeeFromValueSat(btcWalletBalanceSat);
-  //   const maxValueAfterFee =
-  //     walletBalanceAfterFeeSat > maxStakingAmountSat
-  //       ? maxStakingAmountSat
-  //       : walletBalanceAfterFeeSat;
-
-  //   setIsMinActive(satoshis === minStakingAmountSat);
-  //   setIsMaxActive(
-  //     satoshis === maxStakingAmountSat || satoshis === maxValueAfterFee,
-  //   );
-  // };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -124,7 +105,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
   const handleBlur = () => {
     setTouched(true);
-    console.log("HANDLE BLUR, VALUE", value);
     if (value === "") {
       const errorMsg = generalErrorMessage;
       onStakingAmountSatChange(0);
@@ -206,7 +186,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       ),
       8,
     ).toString();
-    console.log(maxValue, "HANDLE MAX CLICK");
     setTouched(true);
 
     setValue(maxValue);
@@ -225,10 +204,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     setTouched(true);
 
     setValue(minValue);
-    console.log(minValue, "HANDLE MIN CLICK MINVALUE");
-    // onStakingAmountSatChange(minStakingAmountSat);
-    // handleBlur();
-    // updateButtonStates(minValue);
   };
 
   return (
