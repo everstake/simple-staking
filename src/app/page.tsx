@@ -34,13 +34,19 @@ import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { TermsModal } from "./components/Modals/Terms/TermsModal";
 import { StakingModal } from "./components/Staking/StakingModal";
-import { provider } from "./components/Staking/provider.data.js";
+import {
+  providerMainnet,
+  providerTestnet,
+} from "./components/Staking/provider.data.js";
 import { Stats } from "./components/Stats/Stats";
 import { Toast } from "./components/Toast/Toast";
 import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
+
+const currentChain = process.env.NEXT_PUBLIC_NETWORK;
+const provider = currentChain === "signet" ? providerTestnet : providerMainnet;
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {

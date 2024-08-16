@@ -355,17 +355,9 @@ export const StakingModal: React.FC<StakingModalProps> = ({
           memoizedFeeRate,
           availableUTXOs,
         );
-        console.log(stakingAmountSat);
-        console.log(
-          "memoizedFeeRate",
-          memoizedFeeRate,
-          defaultFeeRate,
-          stakingFeeSat,
-        );
         return stakingFeeSat;
       } catch (error: Error | any) {
         console.log(error);
-        console.log("estimate fee failed");
         // fees + staking amount can be more than the balance
         showError({
           error: {
@@ -603,7 +595,8 @@ export const StakingModal: React.FC<StakingModalProps> = ({
                   <span className="text-es-text-secondary">
                     By staking, you agree to our{" "}
                     <a
-                      href="/"
+                      href="https://everstake.one/docs/terms-of-use.pdf"
+                      target="_blank"
                       className="underline text-es-text md:hover:no-underline"
                     >
                       Terms of Use
