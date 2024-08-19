@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 import bitcoinWhite from "@/app/assets/bitcoin-white.svg";
 import { getNetworkConfig } from "@/config/network.config";
@@ -27,19 +27,33 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   reset,
   stakingFeeSat,
 }) => {
+  const getFeeFromValueSat = (value: number) => {
+    return value * 0.05;
+  };
+
+  const getMaxValueAfterFee = () => {
+    const walletBalanceAfterFeeSat =
+      btcWalletBalanceSat - getFeeFromValueSat(btcWalletBalanceSat);
+    return walletBalanceAfterFeeSat > maxStakingAmountSat
+      ? maxStakingAmountSat
+      : walletBalanceAfterFeeSat;
+  };
+
   const initialStakingValue = () => {
-    const walletBalanceAfterFeeSat = btcWalletBalanceSat - stakingFeeSat;
-    const maxValueAfterFee =
-      walletBalanceAfterFeeSat > maxStakingAmountSat
-        ? maxStakingAmountSat
-        : walletBalanceAfterFeeSat;
-    onStakingAmountSatChange(maxValueAfterFee);
-    return maxDecimals(satoshiToBtc(maxValueAfterFee), 8).toString();
+    const maxValueAfterFee = getMaxValueAfterFee();
+    const value = maxDecimals(
+      maxValueAfterFee < minStakingAmountSat
+        ? minStakingAmountSat
+        : maxValueAfterFee,
+      0,
+    );
+    onStakingAmountSatChange(value);
+    return maxDecimals(satoshiToBtc(value), 8).toString();
   };
 
   const [value, setValue] = useState(initialStakingValue);
   const [error, setError] = useState("");
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState(true);
   const [isMinActive, setIsMinActive] = useState(false);
   const [isMaxActive, setIsMaxActive] = useState(true);
 
@@ -53,16 +67,23 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     setError("");
     setTouched(false);
     onError("");
-    updateButtonStates(initialValue);
   }, [reset, minStakingAmountSat]);
 
-  const updateButtonStates = (newValue: string) => {
-    const numValue = parseFloat(newValue);
+  useEffect(() => {
+    if (isMaxActive) {
+      handleMaxClick();
+    }
+  }, [stakingFeeSat]);
+
+  useEffect(() => {
+    const numValue = parseFloat(value);
     const satoshis = btcToSatoshi(numValue);
+    const maxValueAfterFee = getMaxValueAfterFee();
+    const maxValue = maxDecimals(maxValueAfterFee, 0);
 
     setIsMinActive(satoshis === minStakingAmountSat);
-    setIsMaxActive(satoshis === maxStakingAmountSat);
-  };
+    setIsMaxActive(satoshis === maxStakingAmountSat || satoshis === maxValue);
+  }, [value, btcWalletBalanceSat, maxStakingAmountSat]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -78,9 +99,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     }
   };
 
-  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
+  const handleBlur = () => {
     setTouched(true);
-
     if (value === "") {
       const errorMsg = generalErrorMessage;
       onStakingAmountSatChange(0);
@@ -91,7 +111,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
     const numValue = parseFloat(value);
     const satoshis = btcToSatoshi(numValue);
-
     const validations = [
       {
         valid: !isNaN(Number(value)),
@@ -100,6 +119,10 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       {
         valid: numValue !== 0,
         message: `${errorLabel} must be greater than 0.`,
+      },
+      {
+        valid: btcWalletBalanceSat > minStakingAmountSat,
+        message: `Insufficient wallet balance. <br/> Minimum staking amount is ${satoshiToBtc(minStakingAmountSat)} BTC.`,
       },
       {
         valid: satoshis >= minStakingAmountSat,
@@ -123,37 +146,36 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
     if (firstInvalid) {
       const errorMsg = firstInvalid.message;
-      onStakingAmountSatChange(0);
       setError(errorMsg);
       onError(errorMsg);
+      onStakingAmountSatChange(0);
     } else {
       setError("");
       onError("");
       onStakingAmountSatChange(satoshis);
-      setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
-
-    updateButtonStates(value);
   };
+
+  useEffect(() => {
+    if (touched) {
+      handleBlur();
+    }
+  }, [value]);
 
   const handleMaxClick = () => {
     setError("");
     onError("");
-
-    const walletBalanceAfterFeeSat = btcWalletBalanceSat - stakingFeeSat;
-    const maxValueAfterFee =
-      walletBalanceAfterFeeSat > maxStakingAmountSat
-        ? maxStakingAmountSat
-        : walletBalanceAfterFeeSat;
-
+    const maxValueAfterFee = getMaxValueAfterFee();
     const maxValue = maxDecimals(
-      satoshiToBtc(maxValueAfterFee < 0 ? 0 : maxValueAfterFee),
+      satoshiToBtc(
+        maxValueAfterFee < minStakingAmountSat
+          ? minStakingAmountSat
+          : maxValueAfterFee,
+      ),
       8,
     ).toString();
-
+    setTouched(true);
     setValue(maxValue);
-    onStakingAmountSatChange(maxValueAfterFee < 0 ? 0 : maxValueAfterFee);
-    updateButtonStates(maxValue);
   };
 
   const handleMinClick = () => {
@@ -163,9 +185,9 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       satoshiToBtc(minStakingAmountSat),
       8,
     ).toString();
+    setTouched(true);
+
     setValue(minValue);
-    onStakingAmountSatChange(minStakingAmountSat);
-    updateButtonStates(minValue);
   };
 
   return (
@@ -186,7 +208,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
           className={`w-full bg-transparent text-center text-5xl font-bold ${error && "input-error"}`}
           value={value}
           onChange={handleChange}
-          onBlur={handleBlur}
           placeholder={coinName}
         />
       </label>

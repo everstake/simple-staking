@@ -1,31 +1,51 @@
-import Image from "next/image";
+import { IoMdClose } from "react-icons/io";
 
 interface MessageProps {
   title: string;
   messages: string[];
   icon: any;
+  onClose: (value: boolean) => void;
 }
 
 // Used for
 // - Staking cap reached
 // - Staking has not started yet
 // - Staking params are upgrading
-export const Message: React.FC<MessageProps> = ({ title, messages, icon }) => {
+export const Message: React.FC<MessageProps> = ({
+  title,
+  messages,
+  icon,
+  onClose,
+}) => {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-neutral-content p-4 dark:border-neutral-content/20">
-      <div className="rounded-full bg-base-200 p-4">
-        <Image src={icon} alt={title} width={32} height={32} />
+    <div className="flex flex-col items-center justify-center gap-2 flex-grow">
+      <div className="absolute right-4 top-4">
+        <button
+          className="btn btn-circle btn-ghost btn-sm"
+          onClick={() => onClose(false)}
+        >
+          <IoMdClose size={24} />
+        </button>
       </div>
-      <h3 className="font-bold">{title}</h3>
-      <div className="flex flex-col items-center justify-center">
-        {messages.map((message) => (
-          <p
-            key={message}
-            className="text-center text-sm font-light dark:text-neutral-content"
-          >
-            {message}
-          </p>
-        ))}
+      <div className="flex flex-col justify-content items-center gap-2  p-4 pt-0 flex-grow">
+        <h3 className="text-center font-semibold text-xl uppercase">{title}</h3>
+        <div className="flex flex-col items-center justify-center pt-3">
+          {messages.map((message) => (
+            <p key={message} className="px-9 text-es-accent font-medium mb-3">
+              {message}
+            </p>
+          ))}
+        </div>
+      </div>
+      <div className="-mx-4 w-full mt-auto flex-shrink">
+        <button
+          className="es-button"
+          onClick={() => {
+            onClose(false);
+          }}
+        >
+          CLOSE
+        </button>
       </div>
     </div>
   );

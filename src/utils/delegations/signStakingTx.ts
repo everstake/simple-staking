@@ -86,7 +86,6 @@ export const createStakingTx = (
       error?.message || "Cannot build unsigned staking transaction",
     );
   }
-
   return { unsignedStakingPsbt, stakingTerm, stakingFeeSat };
 };
 
