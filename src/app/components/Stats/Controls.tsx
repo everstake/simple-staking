@@ -11,17 +11,19 @@ export const Controls: React.FC<ControlsProps> = ({
   address,
   balancesAreNonZero,
 }) => {
-  const buttonText = !address
-    ? "CONNECT"
-    : balancesAreNonZero
-      ? "STAKE MORE"
-      : "STAKE";
+  let buttonText;
+  let infoText;
 
-  const infoText = !address
-    ? 'Press "Connect" to connect wallet'
-    : balancesAreNonZero
-      ? 'Press "Stake more" to increase your staking amount'
-      : 'Press "Stake" to start staking';
+  if (!address) {
+    buttonText = "CONNECT";
+    infoText = 'Press "Connect" to connect wallet';
+  } else if (balancesAreNonZero) {
+    buttonText = "STAKE MORE";
+    infoText = 'Press "Stake more" to increase your staking amount';
+  } else {
+    buttonText = "STAKE";
+    infoText = 'Press "Stake" to start staking';
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
