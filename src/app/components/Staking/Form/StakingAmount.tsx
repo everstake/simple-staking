@@ -100,6 +100,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   };
 
   const handleBlur = () => {
+    setError("");
+    onError("");
     setTouched(true);
     if (value === "") {
       const errorMsg = generalErrorMessage;
@@ -163,8 +165,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   }, [value]);
 
   const handleMaxClick = () => {
-    setError("");
-    onError("");
     const maxValueAfterFee = getMaxValueAfterFee();
     const maxValue = maxDecimals(
       satoshiToBtc(
@@ -179,8 +179,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   };
 
   const handleMinClick = () => {
-    setError("");
-    onError("");
     const minValue = maxDecimals(
       satoshiToBtc(minStakingAmountSat),
       8,
