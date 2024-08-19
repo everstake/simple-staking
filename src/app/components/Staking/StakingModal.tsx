@@ -548,7 +548,6 @@ export const StakingModal: React.FC<StakingModalProps> = ({
             <div className="mb-8 flex flex-col gap-4">
               <h3 className="text-center font-semibold text-xl uppercase">
                 Stake Bitcoin
-                {feeRate}
               </h3>
             </div>
 
