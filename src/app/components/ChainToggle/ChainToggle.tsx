@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import Select from "react-select";
+import Select, { SelectInstance } from "react-select";
 
 export const ChainToggle: React.FC = () => {
   const [mounted, setMounted] = useState(false);
@@ -20,7 +20,8 @@ export const ChainToggle: React.FC = () => {
     value: string;
   }>({ label: CHAINS[0].name, value: CHAINS[0].name });
 
-  const selectRef = useRef<any>(null);
+  const selectRef =
+    useRef<SelectInstance<{ label: string; value: string }>>(null);
 
   useEffect(() => {
     const currentChain = process.env.NEXT_PUBLIC_NETWORK;
@@ -45,6 +46,7 @@ export const ChainToggle: React.FC = () => {
         window.location.href = selectedChain.url;
       }
     }
+    if (selectRef.current === null) return;
     selectRef.current.blur();
   };
 
