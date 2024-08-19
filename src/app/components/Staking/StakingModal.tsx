@@ -257,6 +257,12 @@ export const StakingModal: React.FC<StakingModalProps> = ({
 
   const { minFeeRate, defaultFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
 
+  useEffect(() => {
+    if (defaultFeeRate) {
+      setSelectedFeeRate(defaultFeeRate);
+    }
+  }, [defaultFeeRate]);
+
   // Either use the selected fee rate or the fastest fee rate
   const feeRate = selectedFeeRate || defaultFeeRate;
 
