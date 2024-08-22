@@ -43,7 +43,7 @@ export const questions = (coinName: string): Question[] => {
           The Bitcoin Staking system may be slow, unavailable, or compromised, which may cause the staking service to be unavailable or compromised, potentially leading to BTC not being unbondable or not withdrawable.
         </li>
       </ol>
-      <p>The Babylon Labs team has open-sourced the code which has been audited by <a href="https://docs.babylonlabs.io/assets/files/coinspect-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Coinspect</u></a>, <a href="https://docs.babylonlabs.io/assets/files/zellic-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Zellic</u></a>, and through a <a href="https://docs.babylonlabs.io/assets/files/cantina-phase1-competition.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>public security campaign facilitated by Cantina</u></a>.</p>`,
+      <p>The Babylon Labs team has open-sourced the code which has been audited by <a href="https://docs.babylonlabs.io/assets/files/coinspect-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-es-accent"><u>Coinspect</u></a>, <a href="https://docs.babylonlabs.io/assets/files/zellic-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-es-accent"><u>Zellic</u></a>, and through a <a href="https://docs.babylonlabs.io/assets/files/cantina-phase1-competition.pdf" target="_blank" rel="noopener noreferrer" class="text-es-accent"><u>public security campaign facilitated by Cantina</u></a>.</p>`,
     },
     {
       title: "How long will it take for my stake to become active?",
@@ -60,7 +60,7 @@ export const questions = (coinName: string): Question[] => {
     },
     {
       title: "Are there any other ways to stake?",
-      content: `<p>Hands-on stakers can operate the <a href="https://github.com/babylonlabs-io/btc-staker/blob/dev/docs/create-phase1-staking.md" target="_blank" rel="noopener noreferrer" class="text-primary"><u>btc-staker CLI program</u></a> that allows for the creation of BTC staking transactions from the CLI.</p>`,
+      content: `<p>Hands-on stakers can operate the <a href="https://github.com/babylonlabs-io/btc-staker/blob/dev/docs/create-phase1-staking.md" target="_blank" rel="noopener noreferrer" class="text-es-accent"><u>btc-staker CLI program</u></a> that allows for the creation of BTC staking transactions from the CLI.</p>`,
     },
     {
       title: "Will I pay any fees for staking?",
