@@ -81,7 +81,6 @@ const buildStakingCapSection = (
       value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)}`,
       icon: bitcoinWhite,
       isIconSvg: true,
-      tooltipContent: "tset",
       iconAfterText: undefined,
     };
   }
