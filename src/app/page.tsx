@@ -28,7 +28,6 @@ import { signPsbtTransaction } from "./common/utils/psbt";
 import { ChainToggle } from "./components/ChainToggle/ChainToggle";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
-import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
@@ -493,7 +492,6 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </div>
       <FAQ />
-      <Footer />
       <ConnectModal
         open={connectModalOpen}
         onClose={setConnectModalOpen}
