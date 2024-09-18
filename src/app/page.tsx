@@ -32,6 +32,7 @@ import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { TermsModal } from "./components/Modals/Terms/TermsModal";
+import { SeoContent } from "./components/SeoContent/SeoContent";
 import { StakingModal } from "./components/Staking/StakingModal";
 import {
   providerMainnet,
@@ -491,6 +492,7 @@ const Home: React.FC<HomeProps> = () => {
           /> */}
         </div>
       </div>
+      <SeoContent />
       <FAQ />
       <ConnectModal
         open={connectModalOpen}

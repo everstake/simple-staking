@@ -231,3 +231,27 @@ body.modal-open {
   opacity: 1;
   right: 30px;
 }
+
+.seo-content h1 {
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.seo-content h2 {
+  font-weight: 700;
+  font-size: 20px;
+  margin-bottom: 8px;
+  margin-top: 12px;
+}
+
+.seo-content h3 {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 4px;
+  margin-top: 12px;
+}
+
+.seo-content p {
+  margin-bottom: 4px;
+}
