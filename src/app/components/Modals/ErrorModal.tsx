@@ -78,6 +78,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       title={getErrorTitle()}
       desc={getErrorMessage()}
       onClose={onClose}
+      type="error"
     />
   );
 };
