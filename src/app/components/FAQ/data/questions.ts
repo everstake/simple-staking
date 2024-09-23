@@ -80,6 +80,15 @@ export const questions = (coinName: string): Question[] => {
       <p>In summary, to stake S, you need S + Fs, and upon completion, you get S - Fw or S - Fu - Fw back, depending on whether you wait for expiration or unbond early.</p>`,
     },
     {
+      title:
+        "Is it ok to use a wallet holding fungible tokens built on Bitcoin (e.g. BRC-20/ARC-20/Runes)?",
+      content: `<p>No, this should be avoided. Please do not connect or use a Bitcoin wallet holding BRC-20, ARC-20, Runes, or other NFTs or Bitcoin-native assets (other than BTC). They are still in their infancy and in an experimental phase. Software built for the detection of such tokens to avoid their misspending may not work, and you may lose all such tokens.</p>`,
+    },
+    {
+      title: "Are hardware wallets supported?",
+      content: `<p>Keystone via QR code is the only hardware wallet supporting Bitcoin Staking. Using any other hardware wallet through any means (such as connection to a software/extension/mobile wallet) can lead to permanent inability to withdraw the stake.</p>`,
+    },
+    {
       title: "What is BTC Staking on Babylon?",
       content: `<p>Babylon BTC staking implies locking up BTC to support the security and operation of a PoS blockchain. This way, BTC holders indirectly participate in those PoS blockchains’ consensus in exchange for staking rewards. Notably, it does not imply Bitcoin wrapping.
       </p>
