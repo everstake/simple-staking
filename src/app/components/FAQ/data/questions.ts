@@ -88,6 +88,19 @@ export const questions = (coinName: string): Question[] => {
       title: "Are hardware wallets supported?",
       content: `<p>Keystone via QR code is the only hardware wallet supporting Bitcoin Staking. Using any other hardware wallet through any means (such as connection to a software/extension/mobile wallet) can lead to permanent inability to withdraw the stake.</p>`,
     },
+    {
+      title: "What is BTC Staking on Babylon?",
+      content: `<p>Babylon BTC staking implies locking up BTC to support the security and operation of a PoS blockchain. This way, BTC holders indirectly participate in those PoS blockchains’ consensus in exchange for staking rewards. Notably, it does not imply Bitcoin wrapping.
+      </p>
+      `,
+    },
+    {
+      title: "Is My Bitcoin Secure with Babylon Staking?",
+      content: `<p>Bitcoin staking with Babylon is secure as it employs Bitcoin’s inherent properties and adds more security measures on top of that to guarantee the entire ecosystem’s ultimate security and resilience. Since Babylon is a self-custodial system, users never forfeit the ownership of their assets and remain in control of them. The entire ecosystem uses protection against attacks, dishonest validator behavior, and other potentially harmful issues.
+      </p>
+      `,
+
+    },
   ];
   if (shouldDisplayTestingMsg()) {
     questionList.push({
