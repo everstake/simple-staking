@@ -79,6 +79,18 @@ export const questions = (coinName: string): Question[] => {
       </ol><br />
       <p>In summary, to stake S, you need S + Fs, and upon completion, you get S - Fw or S - Fu - Fw back, depending on whether you wait for expiration or unbond early.</p>`,
     },
+    {
+      title: "What is BTC Staking on Babylon?",
+      content: `<p>Babylon BTC staking implies locking up BTC to support the security and operation of a PoS blockchain. This way, BTC holders indirectly participate in those PoS blockchains’ consensus in exchange for staking rewards. Notably, it does not imply Bitcoin wrapping.
+      </p>
+      `,
+    },
+    {
+      title: "Is My Bitcoin Secure with Babylon Staking?",
+      content: `<p>Bitcoin staking with Babylon is secure as it employs Bitcoin’s inherent properties and adds more security measures on top of that to guarantee the entire ecosystem’s ultimate security and resilience. Since Babylon is a self-custodial system, users never forfeit the ownership of their assets and remain in control of them. The entire ecosystem uses protection against attacks, dishonest validator behavior, and other potentially harmful issues.
+      </p>
+      `,
+    },
   ];
   if (shouldDisplayTestingMsg()) {
     questionList.push({
