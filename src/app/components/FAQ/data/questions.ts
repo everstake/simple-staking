@@ -99,7 +99,6 @@ export const questions = (coinName: string): Question[] => {
       content: `<p>Bitcoin staking with Babylon is secure as it employs Bitcoin’s inherent properties and adds more security measures on top of that to guarantee the entire ecosystem’s ultimate security and resilience. Since Babylon is a self-custodial system, users never forfeit the ownership of their assets and remain in control of them. The entire ecosystem uses protection against attacks, dishonest validator behavior, and other potentially harmful issues.
       </p>
       `,
-
     },
   ];
   if (shouldDisplayTestingMsg()) {

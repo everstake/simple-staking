@@ -3,7 +3,7 @@ interface SeoContentProps {}
 export const SeoContent: React.FC<SeoContentProps> = () => {
   return (
     <div className="seo-content container mx-auto flex flex-col p-6">
-      <h1>Bitcoin (BTC) Staking: Stake BTC on Babylon | Everstake</h1>
+      <h1>Bitcoin (BTC) Staking: Stake BTC on Babylon</h1>
       <p>
         Bitcoin staking has long been a pipe dream for many people in the crypto
         community, yet until recently, it remained more of a subject of
